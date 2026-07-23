@@ -112,6 +112,92 @@ export interface RedisLike {
   ): Promise<T>;
 }
 
+/**
+ * Check whether Redis credentials are available without throwing.
+ */
+export function isRedisConfigured(): boolean {
+  return !!(getRedisUrl() || getUpstashConfig());
+}
+
+/** Safe version of getRedisBackend that returns a fallback string instead of throwing. */
+export function getRedisBackendSafe(): string {
+  try {
+    return getRedisBackend();
+  } catch {
+    return "none";
+  }
+}
+
+/**
+ * No-op Redis adapter returned when no Redis backend is configured.
+ * Every method returns empty/default values so downstream handlers don't crash.
+ */
+class NoopRedisPipelineAdapter implements RedisPipelineLike {
+  get(_key: string): this { return this; }
+  set(_key: string, _value: unknown, _options?: RedisSetOptions): this { return this; }
+  del(..._keys: string[]): this { return this; }
+  type(_key: string): this { return this; }
+  ttl(_key: string): this { return this; }
+  sadd(_key: string, ..._members: string[]): this { return this; }
+  srem(_key: string, ..._members: string[]): this { return this; }
+  lpush(_key: string, ..._values: string[]): this { return this; }
+  ltrim(_key: string, _start: number, _stop: number): this { return this; }
+  zremrangebyscore(_key: string, _min: number | string, _max: number | string): this { return this; }
+  zadd(_key: string, _entry: RedisSortedSetEntry): this { return this; }
+  zcard(_key: string): this { return this; }
+  hincrby(_key: string, _field: string, _increment: number): this { return this; }
+  hset(_key: string, _fields: Record<string, unknown>): this { return this; }
+  hgetall(_key: string): this { return this; }
+  pfadd(_key: string, ..._elements: string[]): this { return this; }
+  pfcount(..._keys: string[]): this { return this; }
+  pfmerge(_destinationKey: string, ..._sourceKeys: string[]): this { return this; }
+  expire(_key: string, _seconds: number): this { return this; }
+  async exec(): Promise<unknown[]> { return []; }
+}
+
+class NoopRedisAdapter implements RedisLike {
+  async get<T = unknown>(_key: string): Promise<T | null> { return null; }
+  async set(_key: string, _value: unknown, _options?: RedisSetOptions): Promise<unknown> { return "OK"; }
+  async setnx(_key: string, _value: unknown): Promise<number> { return 0; }
+  async del(..._keys: string[]): Promise<number> { return 0; }
+  async exists(..._keys: string[]): Promise<number> { return 0; }
+  async expire(_key: string, _seconds: number): Promise<number> { return 0; }
+  async persist(_key: string): Promise<number> { return 0; }
+  async incr(_key: string): Promise<number> { return 1; }
+  async ttl(_key: string): Promise<number> { return -2; }
+  async type(_key: string): Promise<string> { return "none"; }
+  async scan(_cursor: number | string, _options?: RedisScanOptions): Promise<[string | number, string[]]> { return [0, []]; }
+  pipeline(): RedisPipelineLike { return new NoopRedisPipelineAdapter(); }
+  async smembers<T = string[]>(_key: string): Promise<T> { return [] as T; }
+  async scard(_key: string): Promise<number> { return 0; }
+  async sadd(_key: string, ..._members: string[]): Promise<number> { return 0; }
+  async srem(_key: string, ..._members: string[]): Promise<number> { return 0; }
+  async lpush(_key: string, ..._values: string[]): Promise<number> { return 0; }
+  async lrange<T = unknown>(_key: string, _start: number, _stop: number): Promise<T[]> { return []; }
+  async ltrim(_key: string, _start: number, _stop: number): Promise<string> { return "OK"; }
+  async lrem(_key: string, _count: number, _value: string): Promise<number> { return 0; }
+  async llen(_key: string): Promise<number> { return 0; }
+  async lindex<T = unknown>(_key: string, _index: number): Promise<T | null> { return null; }
+  async mget<T = unknown>(..._keys: string[]): Promise<(T | null)[]> { return []; }
+  async hincrby(_key: string, _field: string, _increment: number): Promise<number> { return 0; }
+  async hgetall<T = Record<string, string>>(_key: string): Promise<T | null> { return null; }
+  async hset(_key: string, _fields: Record<string, unknown>): Promise<number> { return 0; }
+  async hget<T = unknown>(_key: string, _field: string): Promise<T | null> { return null; }
+  async hmget<T = unknown>(_key: string, ..._fields: string[]): Promise<(T | null)[]> { return []; }
+  async hdel(_key: string, ..._fields: string[]): Promise<number> { return 0; }
+  async rpush(_key: string, ..._values: string[]): Promise<number> { return 0; }
+  async pfadd(_key: string, ..._elements: string[]): Promise<number> { return 0; }
+  async pfcount(..._keys: string[]): Promise<number> { return 0; }
+  async pfmerge(_destinationKey: string, ..._sourceKeys: string[]): Promise<"OK"> { return "OK"; }
+  async zadd(_key: string, _entry: RedisSortedSetEntry): Promise<number> { return 0; }
+  async zrem(_key: string, _member: string): Promise<number> { return 0; }
+  async zremrangebyscore(_key: string, _min: number | string, _max: number | string): Promise<number> { return 0; }
+  async zrange(_key: string, _start: number, _stop: number): Promise<string[]> { return []; }
+  async zrangeWithScores(_key: string, _start: number, _stop: number): Promise<RedisSortedSetEntry[]> { return []; }
+  async zcard(_key: string): Promise<number> { return 0; }
+  async eval<T = unknown>(_script: string, _keys: string[], _args: Array<string | number>): Promise<T> { return null as T; }
+}
+
 const redisClientCache = globalThis as typeof globalThis & {
   __ryosStandardRedis?: IORedis;
   __ryosUpstashRedis?: Redis;
@@ -610,6 +696,10 @@ function createUpstashRedis(): Redis {
  * the subset of methods the app currently uses.
  */
 export function createRedis(): Redis {
+  if (!isRedisConfigured()) {
+    return new NoopRedisAdapter() as unknown as Redis;
+  }
+
   if (getRedisBackend() === "upstash-rest") {
     return createUpstashRedis();
   }

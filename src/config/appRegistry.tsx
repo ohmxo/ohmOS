@@ -276,6 +276,7 @@ export const appRegistry = {
     component: LazyChatsApp,
     helpItems: chatsHelpItems,
     metadata: chatsMetadata,
+    hidden: true,
     windowConfig: {
       defaultSize: { width: 560, height: 360 },
       minSize: { width: 300, height: 320 },
@@ -634,6 +635,8 @@ export const getNonFinderApps = (isAdmin: boolean = false): Array<{
       if (id === "finder") return acc;
       // Filter out admin-only apps for non-admin users
       if ((app as { adminOnly?: boolean }).adminOnly && !isAdmin) return acc;
+      // Filter out hidden apps (e.g. Chats, kept on disk for potential reuse)
+      if ((app as { hidden?: boolean }).hidden) return acc;
       acc.push({
         name: app.name,
         icon: getAppIconPath(id as AppId),
