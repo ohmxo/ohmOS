@@ -247,7 +247,7 @@ export async function exportAppletAsApp(
     const compressedBlob = new Blob(chunks as BlobPart[], { type: "application/gzip" });
 
     await saveBlobToDevice(compressedBlob, `${finalFilename}.app`, {
-      filters: [{ name: "ryOS Applet", extensions: ["app"] }],
+      filters: [{ name: "OHMXO Applet", extensions: ["app"] }],
     });
 
     toast.success("Applet exported!", {

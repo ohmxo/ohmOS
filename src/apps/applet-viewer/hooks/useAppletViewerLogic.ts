@@ -1185,7 +1185,7 @@ export function useAppletViewerLogic({
       });
 
       await saveBlobToDevice(compressedBlob, `${filename}.app`, {
-        filters: [{ name: "ryOS Applet", extensions: ["app"] }],
+        filters: [{ name: "OHMXO Applet", extensions: ["app"] }],
       });
 
       toast.success(t("apps.applet-viewer.dialogs.appletExported"), {

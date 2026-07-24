@@ -27,7 +27,7 @@ export const helpItems = [
     icon: "📱",
     title: "KOReader Sync",
     description:
-      "Sync reading progress with KOReader on other devices. Sign in to ryOS once, then in KOReader Progress Sync set the custom server to this host’s /api/kosync URL and use your ryOS username and password (prefer filename document matching for EPUBs in /Books).",
+      "Sync reading progress with KOReader on other devices. Sign in once, then in KOReader Progress Sync set the custom server to this host’s /api/kosync URL and use your username and password (prefer filename document matching for EPUBs in /Books).",
   },
   {
     icon: "🅰️",

@@ -134,13 +134,13 @@
       "restoringSystem": "Restoring System…",
       "formattingFileSystem": "Formatting File System…",
       "debugBootScreenTest": "Debug Boot Screen Test…",
-      "updatingToRyOS": "Updating to ryOS {{version}}…",
-      "updatingToRyOSWithBuild": "Updating to ryOS {{version}} ({{buildNumber}})…",
+      "updatingToRyOS": "Updating OHMXO to {{version}}…",
+      "updatingToRyOSWithBuild": "Updating OHMXO to {{version}} ({{buildNumber}})…",
       "rebooting": "Rebooting…",
       "resetAllSettings": "Reset All Settings",
-      "resetAllSettingsDesc": "Are you sure you want to reset all settings? This will clear all saved settings and restore default states. ryOS will restart after reset.",
+      "resetAllSettingsDesc": "Are you sure you want to reset all settings? This will clear all saved settings and restore default states. OHMXO will restart after reset.",
       "formatFileSystem": "Format File System",
-      "formatFileSystemDesc": "Are you sure you want to format the file system? This will permanently delete all documents (except sample documents), images, and custom wallpapers. ryOS will restart after format."
+      "formatFileSystemDesc": "Are you sure you want to format the file system? This will permanently delete all documents (except sample documents), images, and custom wallpapers. OHMXO will restart after format."
     },
     "desktop": {
       "setWallpaper": "Set Wallpaper…",
@@ -172,7 +172,7 @@
       "appDescription": "Relaunch it to open a fresh window, or quit this crashed window. Other open apps will keep running.",
       "relaunch": "Relaunch",
       "desktopHeading": "Desktop quit unexpectedly",
-      "desktopDescription": "Reload ryOS to restore the Dock, Desktop, and menu bar.",
+      "desktopDescription": "Reload to restore the Dock, Desktop, and menu bar.",
       "reloadDesktop": "Reload Desktop"
     },
     "keys": {
@@ -220,7 +220,7 @@
       "genericError": "Oops, something tangled me up. Try again in a moment! 📎",
       "greetings": {
         "hello": "Hi there! I'm {{name}}, your desktop assistant. Click me if you need anything! 👋",
-        "help": "It looks like you're using ryOS! Need a hand with anything? I'm {{name}}, happy to help. 📎",
+        "help": "Need a hand with anything? I'm {{name}}, happy to help. 📎",
         "looksLike": "Hello! {{name}} here — I can open apps, play music, or answer questions. Just ask! ✨",
         "tip": "Hey! I'm {{name}}. Tip: you can drag me anywhere, and I'll snap to your windows and dock. 🪄"
       },
@@ -250,7 +250,7 @@
     },
     "aboutThisMac": {
       "title": "About This Computer",
-      "description": "Information about ryOS on this computer",
+      "description": "Information about this computer",
       "builtInMemory": "Built-in Memory",
       "virtualMemory": "Virtual Memory",
       "virtualMemoryOff": "Off",
@@ -270,17 +270,17 @@
       "updatingAssets": "Updating assets",
       "files": "files",
       "total": "total",
-      "updateReady": "Update ready for ryOS {{version}} ({{buildNumber}})",
+      "updateReady": "Update ready for OHMXO {{version}} ({{buildNumber}})",
       "reboot": "Reboot",
       "failedToCacheAssets": "Failed to cache assets",
       "failedToLoadAssetManifest": "Failed to load asset manifest",
       "noAssetsToCache": "No assets to cache",
       "alreadyLatestVersion": "Already using the latest version",
-      "alreadyLatestVersionDetail": "ryOS {{version}} ({{buildNumber}})",
+      "alreadyLatestVersionDetail": "OHMXO {{version}} ({{buildNumber}})",
       "couldNotCheckUpdates": "Couldn't check for updates"
     },
     "auth": {
-      "dialogTitle": "Sign In to ryOS",
+      "dialogTitle": "Sign In",
       "username": "User name",
       "password": "Password",
       "logIn": "Sign In",
@@ -354,8 +354,8 @@
       "full": "Full",
       "toggleCode": "Toggle code",
       "exitFullscreen": "Exit fullscreen",
-      "codePreviewTitle": "ryOS Code Preview",
-      "codePreviewTitleFullscreen": "ryOS Code Preview Fullscreen"
+      "codePreviewTitle": "Code Preview",
+      "codePreviewTitleFullscreen": "Code Preview Fullscreen"
     },
     "swipeInstructions": {
       "title": "Swipe to Switch Windows",
@@ -366,7 +366,7 @@
   },
   "spotlight": {
     "title": "Spotlight",
-    "placeholder": "Search ryOS",
+    "placeholder": "Search",
     "sections": {
       "apps": "Applications",
       "documents": "Documents",
@@ -523,7 +523,7 @@
     "copied": "Copied",
     "copy": "Copy",
     "fix": "Fix",
-    "fixLogs": "Send logs to Cursor agent",
+    "fixLogs": "Send logs to debug agent",
     "clearLogs": "Clear logs",
     "closeConsole": "Close console",
     "hideConsole": "Hide console",
@@ -537,14 +537,14 @@
     "toggleLabel": "Debug"
   },
   "updates": {
-    "desktopAvailable": "ryOS {{version}} for {{platform}} is available",
-    "desktopAppOffer": "ryOS is available as a {{platform}} app",
+    "desktopAvailable": "OHMXO {{version}} for {{platform}} is available",
+    "desktopAppOffer": "OHMXO is available as a {{platform}} app",
     "download": "Download"
   },
   "settings": {
     "language": {
       "title": "Language",
-      "description": "Select your preferred language for ryOS interface",
+      "description": "Select your preferred language",
       "english": "English",
       "chineseSimplified": "简体中文",
       "chineseTraditional": "繁體中文",
@@ -839,8 +839,8 @@
           "noOutput": "(no output)"
         },
         "cursorCloudAgent": {
-          "starting": "Starting Cursor Cloud agent…",
-          "panelTitle": "Cursor Cloud agent",
+          "starting": "Starting cloud agent…",
+          "panelTitle": "Cloud agent",
           "running": "Running",
           "finished": "Finished",
           "noEventsYet": "Waiting for stream events…",
@@ -849,7 +849,7 @@
           "followupBusy": "Agent is still running…",
           "followupSending": "Sending follow-up…",
           "followupSend": "Send follow-up",
-          "followupAriaLabel": "Follow-up message to the Cursor agent",
+          "followupAriaLabel": "Follow-up message to the cloud agent",
           "stream": {
             "toolUse": "Tool request · {{name}}",
             "toolCall": "Tool · {{name}}",
@@ -868,10 +868,10 @@
           }
         },
         "listCursorCloudAgentRuns": {
-          "loading": "Listing Cursor Cloud agent runs…",
+          "loading": "Listing cloud agent runs…",
           "listed": "Listed {{count}} recent run(s).",
           "truncatedHint": "(list may be truncated)",
-          "openDashboard": "Open agent in Cursor"
+          "openDashboard": "Open agent dashboard"
         },
         "searchedWebFor": "Searched the web for {{query}}",
         "foundVideos": "Found {{count}} videos",
@@ -1487,7 +1487,7 @@
       "telegram": {
         "title": "Telegram",
         "description": "Chat with Ryo in Telegram",
-        "loggedOutDescription": "Sign in to link Telegram to your ryOS account",
+        "loggedOutDescription": "Sign in to link Telegram to your account",
         "checking": "Checking Telegram link…",
         "linkedAs": "Linked as {{account}}",
         "linkPending": "Link ready - finish it in Telegram",
@@ -1513,7 +1513,7 @@
         "loginRequired": "Sign in to link Telegram",
         "heartbeatInstructionsLabel": "Heartbeat instructions",
         "heartbeatInstructionsDescription": "Customize what Ryo should prioritize when sending proactive Telegram check-ins.",
-        "heartbeatInstructionsPlaceholder": "Example: Focus on unfinished ryOS work, avoid generic reminders, and keep morning briefings action-oriented.",
+        "heartbeatInstructionsPlaceholder": "Example: Focus on unfinished work, avoid generic reminders, and keep morning briefings action-oriented.",
         "saveInstructions": "Save",
         "savingInstructions": "Saving…",
         "resetInstructions": "Reset",

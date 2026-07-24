@@ -29,38 +29,40 @@ Deployed as Vercel serverless functions (or the Bun standalone server for self-h
   (optionally) rate limiting, model selection, system-state injection into the prompt,
   tool-call execution, streaming response.
 - Speech-to-text / text-to-speech endpoints for voice features.
-- Content-generation endpoint used by the "Internet Explorer" time-travel app (not needed
-  unless you keep that app).
+- `api/ie-generate.ts` — AI HTML generation for Internet Explorer time-travel app.
+- `api/iframe-check.ts` — Wayback Machine proxying, CORS proxy, AI cache for IE.
 
 ## 5. What depends on Redis (and what doesn't)
 Redis (Upstash) is used ONLY for:
 - `chat:token:*` keys — multi-user auth token storage/refresh for the Chats app.
 - AI message rate-limit counters (per-user/IP, 5-hour sliding window).
+- IE page generation cache (`api/ie-generate.ts`, `api/iframe-check.ts`).
+- Analytics events, geo caching, timezone storage, room management, etc.
+
+**Redis was neutralized via noop adapter** — see REDIS_REMOVAL.md. A `NoopRedisAdapter` in
+`api/_utils/redis.ts` implements the full `RedisLike` interface with no-op methods.
+`createRedis()` returns it when no Redis env vars are set. All existing call sites still
+compile and run — they just get empty/default values back instead of real data.
 
 Redis is NOT used for: window management, themes, file system, tool-calling itself, or any
-of the non-chat apps. Removing it only affects the Chats app's multi-user auth/throttling —
-everything else is unaffected. See REDIS_REMOVAL.md for the exact steps.
+of the non-chat apps. Removing it only affects the Chats app's multi-user auth/throttling
+and IE's backend caching — everything else is unaffected.
 
-Pusher (realtime pub/sub for multi-user chat rooms) is a separate concern from Redis — cutting
-one doesn't require cutting the other, but if you're not running public chat rooms, both can
-go together.
+Pusher (realtime pub/sub for multi-user chat rooms) is a separate concern — not addressed
+in Phase 1. Still wired in the codebase, will no-op if not configured.
 
 ## 6. Where your customization lives
 - `src/apps/` — add new apps here (Studio, Chartmetric widget, etc.), each gets its own folder,
   icon, and entry in the app registry.
 - `src/themes/` — cosmetic changes (colors, wallpaper defaults) without touching logic.
 - `public/` — icons, sounds, default wallpapers, fonts.
-- `api/chat.ts` — only touch this for the Redis/auth changes, or to add new tool calls for a
-  custom app (e.g. a tool that opens your Studio case-study files).
+- `api/chat.ts` — only touch this for new tool calls for a custom app; Redis/auth changes
+  were handled at the handler level (see REDIS_REMOVAL.md).
 
 ## 7. Deployment
 Two supported paths: Vercel (serverless, matches the original repo's design) or self-host via
 the single Bun production server (Docker/Coolify). Self-host avoids any Vercel KV/Redis
-coupling by default unless you opt into it for the chat feature.
+coupling by default.
 
 ## 8. Licensing — read this before shipping publicly
-ryOS is AGPL-3.0 licensed. AGPL's key difference from MIT/Apache: if you run a *modified*
-version of AGPL code as a network service that other people interact with (which a public
-website is), you are required to make your modified source code available to those users —
-even though you never distributed a binary. This applies to your fork once it's live at
-ohmxo.com. See LICENSE_NOTES.md for what this means in practice and your options.
+ryOS is AGPL-3.0 licensed. See LICENSE_NOTES.md for details.

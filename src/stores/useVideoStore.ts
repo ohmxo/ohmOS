@@ -17,28 +17,28 @@ import type { VideoItem as Video } from "@/shared/media/library";
 
 export const DEFAULT_VIDEOS: Video[] = [
   {
-    id: "0pP3ZjMDzF4",
-    url: "https://youtu.be/0pP3ZjMDzF4",
-    title: "Make Something Wonderful",
-    artist: "Steve Jobs",
+    id: "SHAQlFq6TFg",
+    url: "https://www.youtube.com/watch?v=SHAQlFq6TFg",
+    title: "Fastlove (Official Video)",
+    artist: "George Michael",
   },
   {
-    id: "3vq9p00T08I",
-    url: "https://youtu.be/3vq9p00T08I",
-    title: "Macintosh (1984)",
-    artist: "Apple Computer",
+    id: "T7dTZOt9PZo",
+    url: "https://www.youtube.com/watch?v=T7dTZOt9PZo",
+    title: "A New UK Movement | Signature Sound Cypher [Round 2]",
+    artist: "Namesbliss, Paul Stephan, Pozzy, DeeRiginal & more",
   },
   {
-    id: "2B-XwPjn9YY",
-    url: "https://youtu.be/2B-XwPjn9YY",
-    title: "Macintosh Introduction (1984)",
-    artist: "Steve Jobs",
+    id: "vTfd54EO_YY",
+    url: "https://www.youtube.com/watch?v=vTfd54EO_YY",
+    title: "VIBES DON'T LIE | A COLORS SHOW",
+    artist: "Leon Thomas",
   },
   {
-    id: "VFP-VZtgb0s",
-    url: "https://youtu.be/VFP-VZtgb0s",
-    title: "iMac G3 vs PC Simplicity (1998)",
-    artist: "Apple Computer",
+    id: "fN-xq7t6pKw",
+    url: "https://www.youtube.com/watch?v=fN-xq7t6pKw",
+    title: "Rella",
+    artist: "Odd Future",
   },
   {
     id: "dtaSDVpAo4c",
@@ -123,12 +123,6 @@ export const DEFAULT_VIDEOS: Video[] = [
     url: "https://youtu.be/wLb9g_8r-mE",
     title: "A Conversation with Jony Ive",
     artist: "Jony Ive",
-  },
-  {
-    id: "TQhv6Wol6Ns",
-    url: "https://www.youtube.com/watch?v=TQhv6Wol6Ns&t=26s",
-    title: "Our designer built an OS with Cursor",
-    artist: "Cursor",
   },
 ];
 

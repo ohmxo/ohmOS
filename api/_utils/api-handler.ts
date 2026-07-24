@@ -2,7 +2,7 @@ import type { ApiRequest, ApiResponse } from "./api-types.js";
 import type { Redis } from "./redis.js";
 import { initLogger } from "./_logging.js";
 import { getEffectiveOrigin, isAllowedOrigin, setCorsHeaders } from "./_cors.js";
-import { createRedis, getRedisBackend, isRedisConfigured } from "./redis.js";
+import { createRedis, getRedisBackendSafe } from "./redis.js";
 import { resolveRequestAuth, type AuthenticatedRequestUser } from "./request-auth.js";
 import { recordAnalyticsEvent } from "./_analytics.js";
 import { getClientIp } from "./_rate-limit.js";

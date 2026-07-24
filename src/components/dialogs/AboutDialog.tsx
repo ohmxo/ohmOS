@@ -48,7 +48,7 @@ export function AboutDialog({
 
   const handleViewDocs = () => {
     const docName = appId ? (APP_DOC_NAMES[appId] || appId) : "";
-    launchApp("internet-explorer", { url: `os.ryo.lu/docs/${docName}`, year: "current" });
+    launchApp("internet-explorer", { url: `ohmxo.com/docs/${docName}`, year: "current" });
     onOpenChange(false);
   };
 

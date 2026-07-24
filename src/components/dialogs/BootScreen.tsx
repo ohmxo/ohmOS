@@ -229,19 +229,17 @@ export function BootScreen({
                 className="boot-screen-apple-logo size-[120px] object-contain"
                 style={{ marginBottom: "-30px" }}
               />
-              {/* ryOS X text */}
-              <h1 
+              {/* OHMXO boot title */}
+              <h1
                 className="text-[52px] mb-6"
-                style={{ 
-                  // Theme tokens so dark mode flips the boot title to a
-                  // light glyph against the dark pinstripe surface.
+                style={{
                   color: "var(--os-color-text-primary, #333333)",
                   fontFamily: "AppleGaramond, 'Apple Garamond', 'Times New Roman', serif",
                   letterSpacing: "1px",
                   textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
                 }}
               >
-                ryOS X
+                OHMXO
               </h1>
               {/* Progress bar - using aqua-progress classes */}
               <div className="aqua-progress w-[220px] h-[20px] rounded-none" style={{ borderRadius: 0 }}>
@@ -296,7 +294,7 @@ export function BootScreen({
                 style={{ filter: "invert(1)" }}
               />
               <h1 className="text-[36px] font-mondwest mt-4 mb-0">
-                <span className="text-blue-500">ry</span>OS
+                <span className="text-blue-500">OH</span>MXO
               </h1>
             </div>
             <h2 className="text-[16px] font-chicago mt-4 mb-1">

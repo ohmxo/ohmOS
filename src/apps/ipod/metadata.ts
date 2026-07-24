@@ -24,7 +24,7 @@ export const helpItems = [
     icon: "🔗",
     title: "Share Songs",
     description:
-      "YouTube songs share ryOS links, while Apple Music songs copy their Apple Music link",
+      "YouTube songs share links, while Apple Music songs copy their Apple Music link",
   },
   {
     icon: "📺",

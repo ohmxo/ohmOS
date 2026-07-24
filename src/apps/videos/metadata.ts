@@ -2,7 +2,7 @@ export const helpItems = [
   {
     icon: "🎥",
     title: "Add from YouTube",
-    description: "Paste any YouTube URL and ryOS fetches the metadata into your playlist",
+    description: "Paste any YouTube URL to fetch metadata into your playlist",
   },
   {
     icon: "▶️",

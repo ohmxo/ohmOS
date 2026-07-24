@@ -115,16 +115,16 @@ export const DEFAULT_FAVORITES: Favorite[] = [
     isDirectory: false,
   },
   {
-    title: "Ryo",
-    url: "https://ryo.lu",
-    favicon: "https://www.google.com/s2/favicons?domain=ryo.lu&sz=32",
+    title: "OHMXO",
+    url: "https://ohmxo.com",
+    favicon: "https://www.google.com/s2/favicons?domain=ohmxo.com&sz=32",
     year: "current",
     isDirectory: false,
   },
   {
-    title: "ryOS Docs",
-    url: "https://os.ryo.lu/docs",
-    favicon: "https://www.google.com/s2/favicons?domain=os.ryo.lu&sz=32",
+    title: "Docs",
+    url: "https://ohmxo.com/docs",
+    favicon: "https://www.google.com/s2/favicons?domain=ohmxo.com&sz=32",
     year: "current",
     isDirectory: false,
   },
@@ -230,10 +230,10 @@ export const DEFAULT_FAVORITES: Favorite[] = [
     isDirectory: true, // Mark as directory
     children: [
       {
-        title: "Cursor",
-        url: "https://cursor.sh",
-        favicon: "https://www.google.com/s2/favicons?domain=cursor.com&sz=32",
-        year: "1992",
+        title: "GitHub",
+        url: "https://github.com/ohmxo",
+        favicon: "https://www.google.com/s2/favicons?domain=github.com&sz=32",
+        year: "current",
         isDirectory: false,
       },
       {

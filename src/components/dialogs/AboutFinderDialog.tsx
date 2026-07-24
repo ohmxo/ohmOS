@@ -263,7 +263,7 @@ export function AboutFinderDialog({
                     : "font-os-ui text-xl"
                 )}
               >
-                ryOS
+                OHMXO
                 {currentTheme === "system7"
                   ? " 7"
                   : currentTheme === "macosx"
@@ -325,7 +325,7 @@ export function AboutFinderDialog({
                     : undefined
                 }
               >
-                <p>© Ryo Lu. 1992-{new Date().getFullYear()}</p>
+                <p>© Jacob Adeshiyan. 2024-{new Date().getFullYear()}</p>
                 <p>
                   {isMac && desktopDownloadUrl && (
                     <>
@@ -345,7 +345,7 @@ export function AboutFinderDialog({
                     onClick={(e) => {
                       e.preventDefault();
                       launchApp("internet-explorer", {
-                        url: "os.ryo.lu/docs/changelog",
+                        url: "ohmxo.com/docs/changelog",
                         year: "current",
                       });
                       onOpenChange(false);

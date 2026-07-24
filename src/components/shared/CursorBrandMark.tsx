@@ -7,7 +7,7 @@ export interface CursorBrandMarkProps {
 }
 
 /**
- * Cursor cube logo in a fully round badge (light/dark assets).
+ * OHMXO brand mark in a fully round badge (light/dark assets).
  */
 export function CursorBrandMark({ size = 9, className }: CursorBrandMarkProps) {
   const outer = size === 9 ? "size-9" : "size-6";
@@ -23,7 +23,7 @@ export function CursorBrandMark({ size = 9, className }: CursorBrandMarkProps) {
       aria-hidden
     >
       <img
-        src="/brands/cursor-cube-2d-light.svg"
+        src="/brands/ohmxo-mark-light.svg"
         alt=""
         width={size === 9 ? 20 : 16}
         height={size === 9 ? 20 : 16}
@@ -31,7 +31,7 @@ export function CursorBrandMark({ size = 9, className }: CursorBrandMarkProps) {
         draggable={false}
       />
       <img
-        src="/brands/cursor-cube-2d-dark.svg"
+        src="/brands/ohmxo-mark-dark.svg"
         alt=""
         width={size === 9 ? 20 : 16}
         height={size === 9 ? 20 : 16}

@@ -44,6 +44,6 @@ export const helpItems = [
     icon: "💱",
     title: "Live Currency",
     description:
-      "Currency conversions fetch exchange rates through the ryOS API",
+      "Currency conversions fetch exchange rates through the API",
   },
 ];

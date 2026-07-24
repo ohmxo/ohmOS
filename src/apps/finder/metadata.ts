@@ -32,7 +32,7 @@ export const helpItems = [
     icon: "📡",
     title: "AirDrop Sharing",
     description:
-      "Right-click any file to AirDrop it to nearby ryOS users instantly",
+      "Right-click any file to AirDrop it to nearby users instantly",
   },
   {
     icon: "📥",

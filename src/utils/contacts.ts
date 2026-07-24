@@ -65,13 +65,13 @@ export interface ContactImportResult {
 
 const EMPTY_CONTACT_VALUE_LABEL = "other";
 export const DEFAULT_RYO_CONTACT_DRAFT: ContactDraft = {
-  displayName: "Ryo Lu",
-  firstName: "Ryo",
-  lastName: "Lu",
-  nickname: "ryo",
-  organization: "Cursor",
-  emails: ["me@ryo.lu"],
-  urls: ["https://ryo.lu", "https://x.com/ryolu_", "https://os.ryo.lu"],
+  displayName: "Jacob Adeshiyan",
+  firstName: "Jacob",
+  lastName: "Adeshiyan",
+  nickname: "jacob",
+  organization: "OHMXO",
+  emails: ["jacob@ohmxo.com"],
+  urls: ["https://ohmxo.com"],
   source: "manual",
 };
 const CONTACT_SOURCES: readonly ContactSource[] = [
