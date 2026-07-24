@@ -6,6 +6,19 @@
 
 ---
 
+## Quick Reference
+
+```bash
+# Development
+bun run dev              # Full stack (API + Vite)
+bun run dev:vite         # Frontend only
+bun run typecheck        # TypeScript check
+bun run lint             # ESLint
+bun run build            # Production build
+```
+
+---
+
 ## Phase 1 — Foundation (Complete ✅)
 
 Strip Redis dependency, hide Chats app, configure remotes.
@@ -31,6 +44,7 @@ Replace user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob. Content-only �
 
 ### Commits
 - `88895db0a` — Phase 1.5 branding cleanup (48 files)
+- `79e6e0432` — docs: add PROJECT_STATUS.md
 
 ### Files modified
 
@@ -83,6 +97,26 @@ Replace user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob. Content-only �
 
 ---
 
+## Known Bugs
+
+### iPod — Click Wheel Not Responding on Desktop
+The iPod uses a touch/click-wheel interface (`IpodWheel.tsx`) that requires click-and-drag rotation or touch gestures. On desktop with a mouse/trackpad:
+- **Click-and-drag** on the wheel ring (not the center button) to rotate — this works but may not be obvious
+- **Scroll wheel** on the wheel ring also works
+- If nothing happens, the wheel may not be receiving events properly — the click areas are mapped to 4 sections around the wheel (top=menu, right=skip, bottom=play, left=back)
+
+**Fix needed:** The wheel interaction model is not discoverable. A trackpad two-finger scroll or simple scroll gesture should work. The `handleMouseWheel` handler exists but only fires when the cursor is directly over the wheel div.
+
+### Internet Explorer — Does Not Load Pages
+IE requires the backend API (`/api/iframe-check`) to proxy pages and the AI generation endpoint (`/api/ie-generate`) for time-travel content. Both are dependent on:
+- **API server running** — `bun run dev` starts the full stack, but `bun run dev:vite` (frontend only) means IE has no backend
+- **AI provider key** — time-travel AI generation requires at least one of `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GOOGLE_GENERATIVE_AI_API_KEY`
+- **Redis** — AI generation results are cached in Redis (NoopRedisAdapter returns cache misses, so generation still works but is uncached)
+
+**To test IE:** Run `bun run dev` (full stack), set an AI provider key in `.env.local`, and try loading a modern URL like `https://example.com`. If the page loads in an iframe, IE is working. The time-travel feature (year selector) will only work with an AI key.
+
+---
+
 ## Items Intentionally Left Untouched
 
 | Category | Reason |
@@ -129,7 +163,8 @@ Reference: `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`
 | STT `/api/audio-transcribe` | Wired, blocked | `OPENAI_API_KEY` |
 | Rate limiting | Disabled (NoopRedisAdapter bypass) | Enable if Redis is configured |
 | Conversation persistence | Disabled | Requires Redis |
-| IE generation `/api/ie-generate` | Wired but app visible | AI key + Redis for caching |
+| IE generation `/api/ie-generate` | Wired, needs key + backend | AI key + API server running |
+| IE iframe proxy `/api/iframe-check` | Wired, needs backend | API server running |
 | Applet AI `/api/applet-ai` | Wired | `GOOGLE_GENERATIVE_AI_API_KEY` |
 
 Key finding: With just one AI provider key (e.g., `ANTHROPIC_API_KEY`), chat works immediately for single-session use. Full functionality (history, persistence) requires Redis. Pusher is optional (graceful fallback).
@@ -156,16 +191,3 @@ Key finding: With just one AI provider key (e.g., `ANTHROPIC_API_KEY`), chat wor
 11. Set AI provider keys in production
 12. Configure domain (ohmxo.com DNS)
 13. Privacy/AGPL disclosure
-
----
-
-## Quick Reference
-
-```bash
-# Development
-bun run dev              # Full stack (API + Vite)
-bun run dev:vite         # Frontend only
-bun run typecheck        # TypeScript check
-bun run lint             # ESLint
-bun run build            # Production build
-```
