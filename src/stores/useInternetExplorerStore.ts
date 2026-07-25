@@ -343,7 +343,7 @@ export const DEFAULT_FAVORITES: Favorite[] = [
 ];
 
 // Define the current version for the store
-const CURRENT_IE_STORE_VERSION = 7;
+const CURRENT_IE_STORE_VERSION = 8;
 
 // Helper function to classify year into navigation mode
 function classifyYear(year: string): NavigationMode {
@@ -902,8 +902,8 @@ export const useInternetExplorerStore = create<InternetExplorerStore>()(
       name: "ryos:internet-explorer",
       version: CURRENT_IE_STORE_VERSION,
       migrate: (persisted, version) => {
-        // Version 7: reset defaults to avoid stale state from old versions
-        if (version < 7) {
+        // Version 8: reset defaults to avoid stale state from old versions
+        if (version < 8) {
           return { ...getInitialState() };
         }
         return persisted as InternetExplorerStore;
