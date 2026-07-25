@@ -1171,6 +1171,9 @@ export default apiHandler(
       // HTML fragments fetched via the re-proxied fetch/XHR are not corrupted.
       if (isRawProxy) {
         writeProxyDebugHeader();
+        // Allow cross-origin sub-resources (fonts, scripts, CSS, images) to
+        // be loaded by the proxied HTML page.
+        res.setHeader("Access-Control-Allow-Origin", "*");
         if (contentType) res.setHeader("Content-Type", contentType);
         const cacheControl = upstreamRes.headers.get("cache-control");
         if (cacheControl) res.setHeader("Cache-Control", cacheControl);
@@ -1243,7 +1246,83 @@ export default apiHandler(
         // Strip Content-Security-Policy headers embedded via <meta> with reversed attribute order
         html = html.replace(/<meta[^>]*content\s*=\s*["'][^"']*["'][^>]*http-equiv\s*=\s*["']?Content-Security-Policy["']?[^>]*>/gi, '');
 
-        // Extract title before modifying HTML
+        // --- Rewrite cross-origin resource URLs to go through the proxy ---
+        // The base href tag only fixes relative URLs, but absolute URLs in
+        // img src, script src, link href, source, and CSS url() still fetch
+        // directly from the upstream and get CORS-blocked. Use HTMLRewriter
+        // to rewrite them to absolute raw proxy URLs. Must be absolute URLs
+        // because the base href points at the upstream origin.
+        const proxyBase = getAppPublicOrigin(effectiveOrigin);
+        function rawProxyUrl(href: string): string {
+          return proxyBase + "/api/iframe-check?raw=1&url=" + encodeURIComponent(href);
+        }
+
+        // Resolve the upstream origin so we only rewrite absolute cross-origin URLs
+        let upstreamOrigin: string | null = null;
+        try { upstreamOrigin = new URL(targetUrl || finalUrl || "").origin; } catch {}
+        if (upstreamOrigin && upstreamOrigin !== proxyBase) {
+          try {
+            html = new HTMLRewriter()
+              .on("img[src]", {
+                element(el) {
+                  const src = el.getAttribute("src");
+                  if (src && src.startsWith("http") && !src.startsWith(proxyBase)) {
+                    el.setAttribute("src", rawProxyUrl(src));
+                    el.setAttribute("crossorigin", "anonymous");
+                  }
+                },
+              })
+              .on("script[src]", {
+                element(el) {
+                  const src = el.getAttribute("src");
+                  if (src && src.startsWith("http") && !src.startsWith(proxyBase)) {
+                    el.setAttribute("src", rawProxyUrl(src));
+                  }
+                },
+              })
+              .on("link[href]", {
+                element(el) {
+                  const href = el.getAttribute("href");
+                  if (href && href.startsWith("http") && !href.startsWith(proxyBase)) {
+                    el.setAttribute("href", rawProxyUrl(href));
+                  }
+                },
+              })
+              .on("source[src]", {
+                element(el) {
+                  const src = el.getAttribute("src");
+                  if (src && src.startsWith("http") && !src.startsWith(proxyBase)) {
+                    el.setAttribute("src", rawProxyUrl(src));
+                  }
+                },
+              })
+              .on("source[srcset]", {
+                element(el) {
+                  const srcset = el.getAttribute("srcset");
+                  if (srcset) {
+                    const rewritten = srcset.replace(
+                      /(https?:\/\/[^\s]+)(\s|$)/g,
+                      (_m: string, url: string, sep: string) => rawProxyUrl(url) + sep
+                    );
+                    if (rewritten !== srcset) el.setAttribute("srcset", rewritten);
+                  }
+                },
+              })
+              .on("video[poster]", {
+                element(el) {
+                  const poster = el.getAttribute("poster");
+                  if (poster && poster.startsWith("http") && !poster.startsWith(proxyBase)) {
+                    el.setAttribute("poster", rawProxyUrl(poster));
+                  }
+                },
+              })
+              .transform(html);
+          } catch (urlErr) {
+            logger.warn("URL rewriting failed, continuing with original HTML", urlErr);
+          }
+        }
+
+        // Extract title before modifying HTML        // Extract title before modifying HTML
         const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
         if (titleMatch && titleMatch[1]) {
           pageTitle = decodeHtmlEntitiesOnce(titleMatch[1]).trim();
