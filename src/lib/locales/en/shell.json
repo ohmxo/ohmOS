@@ -134,8 +134,8 @@
       "restoringSystem": "Restoring System…",
       "formattingFileSystem": "Formatting File System…",
       "debugBootScreenTest": "Debug Boot Screen Test…",
-      "updatingToRyOS": "Updating OHMXO to {{version}}…",
-      "updatingToRyOSWithBuild": "Updating OHMXO to {{version}} ({{buildNumber}})…",
+      "updatingToRyOS": "Updating to ryOS {{version}}…",
+      "updatingToRyOSWithBuild": "Updating to ryOS {{version}} ({{buildNumber}})…",
       "rebooting": "Rebooting…",
       "resetAllSettings": "Reset All Settings",
       "resetAllSettingsDesc": "Are you sure you want to reset all settings? This will clear all saved settings and restore default states. OHMXO will restart after reset.",
@@ -523,7 +523,7 @@
     "copied": "Copied",
     "copy": "Copy",
     "fix": "Fix",
-    "fixLogs": "Send logs to debug agent",
+    "fixLogs": "Send logs to Cursor agent",
     "clearLogs": "Clear logs",
     "closeConsole": "Close console",
     "hideConsole": "Hide console",
@@ -839,8 +839,8 @@
           "noOutput": "(no output)"
         },
         "cursorCloudAgent": {
-          "starting": "Starting cloud agent…",
-          "panelTitle": "Cloud agent",
+          "starting": "Starting Cursor Cloud agent…",
+          "panelTitle": "Cursor Cloud agent",
           "running": "Running",
           "finished": "Finished",
           "noEventsYet": "Waiting for stream events…",
@@ -849,7 +849,7 @@
           "followupBusy": "Agent is still running…",
           "followupSending": "Sending follow-up…",
           "followupSend": "Send follow-up",
-          "followupAriaLabel": "Follow-up message to the cloud agent",
+          "followupAriaLabel": "Follow-up message to the Cursor agent",
           "stream": {
             "toolUse": "Tool request · {{name}}",
             "toolCall": "Tool · {{name}}",
@@ -868,10 +868,10 @@
           }
         },
         "listCursorCloudAgentRuns": {
-          "loading": "Listing cloud agent runs…",
+          "loading": "Listing Cursor Cloud agent runs…",
           "listed": "Listed {{count}} recent run(s).",
           "truncatedHint": "(list may be truncated)",
-          "openDashboard": "Open agent dashboard"
+          "openDashboard": "Open agent in Cursor"
         },
         "searchedWebFor": "Searched the web for {{query}}",
         "foundVideos": "Found {{count}} videos",

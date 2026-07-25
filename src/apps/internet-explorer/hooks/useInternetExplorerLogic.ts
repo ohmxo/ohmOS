@@ -140,7 +140,6 @@ export function useInternetExplorerLogic({
     setLanguage,
     setLocation,
     setTimeMachineViewOpen,
-    fetchCachedYears,
     debugProxySessions,
     debugForceHeadless,
     debugVerboseLogging,
@@ -198,7 +197,6 @@ export function useInternetExplorerLogic({
     setLanguage: state.setLanguage,
     setLocation: state.setLocation,
     setTimeMachineViewOpen: state.setTimeMachineViewOpen,
-    fetchCachedYears: state.fetchCachedYears,
     debugProxySessions: state.debugProxySessions,
     debugForceHeadless: state.debugForceHeadless,
     debugVerboseLogging: state.debugVerboseLogging,
@@ -224,31 +222,6 @@ export function useInternetExplorerLogic({
   // advanced proxy toggles below opt into env-gated proxy features
   // (cookie/session passthrough, forced headless) per browser.
   const showDebugMenu = debugMode;
-
-  // Append the active debug toggles to a proxy (`/api/iframe-check`) URL so the
-  // server opts the request into the gated features. `dbg=1` signals the server
-  // that this is an admin/debug-mode caller permitted to use them.
-  const appendIeDebugParams = useCallback(
-    (proxyUrl: string): string => {
-      if (!proxyUrl.startsWith("/api/iframe-check")) return proxyUrl;
-      const extra: string[] = [];
-      if (debugForceHeadless) extra.push("render=headless", "dbg=1");
-      if (debugProxySessions) extra.push("ieSessions=1", "dbg=1");
-      if (extra.length === 0) return proxyUrl;
-      // De-dupe the dbg flag.
-      const unique = Array.from(new Set(extra));
-      const sep = proxyUrl.includes("?") ? "&" : "?";
-      const next = `${proxyUrl}${sep}${unique.join("&")}`;
-      if (debugVerboseLogging) {
-        log.info("[debug] proxy params", {
-          headless: debugForceHeadless,
-          sessions: debugProxySessions,
-        });
-      }
-      return next;
-    },
-    [debugForceHeadless, debugProxySessions, debugVerboseLogging]
-  );
 
   const getSharedPageToastDescription = useCallback(
     (sharedPage: { url: string; year?: string }) =>
@@ -432,7 +405,6 @@ export function useInternetExplorerLogic({
   const favoritesContainerRef = useRef<HTMLDivElement>(null);
 
   const {
-    generateFuturisticWebsite,
     aiGeneratedHtml: generatedHtml,
     isAiLoading,
     isFetchingWebsiteContent,
@@ -545,22 +517,6 @@ export function useInternetExplorerLogic({
 
     setDisplayTitle(newTitle);
   }, [status, currentPageTitle, finalUrl, url, year, t, getLoadingTitle, appName]);
-
-  const getWaybackUrl = useCallback(async (targetUrl: string, year: string) => {
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const formattedUrl = targetUrl.startsWith("http")
-      ? targetUrl
-      : `https://${targetUrl}`;
-    log.debug("Using Wayback Machine URL", { url: formattedUrl, year });
-    const themeParam =
-      typeof currentTheme === "string"
-        ? `&theme=${encodeURIComponent(currentTheme)}`
-        : "";
-    return `/api/iframe-check?url=${encodeURIComponent(
-      formattedUrl
-    )}&year=${year}&month=${month}${themeParam}`;
-  }, [currentTheme]);
 
   // Ref to keep the most recent navigation token in sync without waiting for a render
   const navTokenRef = useRef<number>(0);
@@ -921,7 +877,6 @@ export function useInternetExplorerLogic({
       isAiLoading,
       navigateStart,
       setFinalUrl,
-      generateFuturisticWebsite,
       stopGeneration,
       loadSuccess,
       clearErrorDetails,
@@ -929,13 +884,8 @@ export function useInternetExplorerLogic({
       handleNavigationError,
       setPrefetchedTitle,
       setUrl,
-      fetchCachedYears,
       currentTheme,
-      getWaybackUrl,
       localUrl,
-      playElevatorMusic,
-      terminalSoundsEnabled,
-      appendIeDebugParams,
       debugVerboseLogging,
       debugForceHeadless,
       debugProxySessions,
