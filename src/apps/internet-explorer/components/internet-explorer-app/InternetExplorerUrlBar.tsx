@@ -72,10 +72,9 @@ export function InternetExplorerUrlBar({
   const navigateFromSuggestion = (suggestion: InternetExplorerSuggestionItem) => {
     if (suggestion.type === "search") {
       const searchQuery = suggestion.url.substring(5);
-      window.open(
+      handleNavigate(
         `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`,
-        "_blank",
-        "noopener,noreferrer"
+        "current"
       );
     } else {
       handleNavigateWithHistory(suggestion.url, suggestion.year);
@@ -111,13 +110,11 @@ export function InternetExplorerUrlBar({
               setUrl(localUrl);
               handleNavigate(localUrl);
             } else if (localUrl.trim()) {
-              // Non-URL text: search DuckDuckGo in a new tab
-              window.open(
+              // Non-URL text: search DuckDuckGo via the proxy
+              handleNavigate(
                 `https://duckduckgo.com/?q=${encodeURIComponent(localUrl.trim())}`,
-                "_blank",
-                "noopener,noreferrer"
+                "current"
               );
-              setLocalUrl(stripProtocol(url));
             } else {
               setLocalUrl(stripProtocol(url));
             }

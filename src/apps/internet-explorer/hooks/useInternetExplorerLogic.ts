@@ -774,7 +774,7 @@ export function useInternetExplorerLogic({
 
           if (newMode === "now") {
             if (isDirectPassthrough(normalizedTargetUrl)) {
-              // Passthrough domain (search engine) — load directly in iframe
+              // Passthrough domain — load directly in iframe (these allow iframing)
               logDirectPassthrough(normalizedTargetUrl);
               urlToLoad = normalizedTargetUrl;
 
@@ -802,20 +802,16 @@ export function useInternetExplorerLogic({
                 // Non-fatal — title fetch is best-effort
               }
             } else {
-              // Non-passthrough domain — every site blocks iframing, so open
-              // in a new browser tab instead.
-              window.open(normalizedTargetUrl, "_blank", "noopener,noreferrer");
-              // Reset to start page
-              clearIframeLoadTimeout();
-              cancel();
-              if (iframeRef.current) {
-                iframeRef.current.src = "about:blank";
-              }
-              return;
+              // Non-passthrough domain — route through the backend proxy which
+              // strips X-Frame-Options and frame-ancestors headers so the page
+              // loads in the iframe. The proxy also injects a navigation
+              // interceptor and handles sub-resource forwarding.
+              urlToLoad = `/api/iframe-check?mode=proxy&url=${encodeURIComponent(normalizedTargetUrl)}&theme=${encodeURIComponent(currentTheme)}`;
             }
           } else {
-            // "past" mode (1996+) — load directly in iframe without Wayback proxy
-            urlToLoad = normalizedTargetUrl;
+            // "past" mode (1996+) — route through the Wayback Machine proxy
+            const targetMonth = String(new Date().getMonth() + 1).padStart(2, "0");
+            urlToLoad = `/api/iframe-check?mode=proxy&url=${encodeURIComponent(normalizedTargetUrl)}&year=${encodeURIComponent(targetYearParam)}&month=${encodeURIComponent(targetMonth)}&theme=${encodeURIComponent(currentTheme)}`;
           }
 
           if (urlToLoad === finalUrl) {

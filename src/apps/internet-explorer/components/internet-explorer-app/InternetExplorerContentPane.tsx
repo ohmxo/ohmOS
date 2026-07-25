@@ -200,6 +200,7 @@ export function InternetExplorerContentPane({
             favorites={favorites}
             t={t}
             currentTheme={currentTheme}
+            handleNavigate={handleNavigate}
           />
         ) : (
           <iframe

@@ -5,12 +5,14 @@ interface IeStartPageProps {
   favorites: Favorite[];
   t: (key: string, opts?: Record<string, unknown>) => string;
   currentTheme: string;
+  handleNavigate: (navUrl: string, navYear?: string) => void;
 }
 
 export function IeStartPage({
   favorites,
   t,
   currentTheme,
+  handleNavigate,
 }: IeStartPageProps) {
   const [query, setQuery] = useState("");
   const isDark =
@@ -23,9 +25,9 @@ export function IeStartPage({
       const q = query.trim();
       if (!q) return;
       const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(q)}`;
-      window.open(searchUrl, "_blank", "noopener,noreferrer");
+      handleNavigate(searchUrl, "current");
     },
-    [query]
+    [query, handleNavigate]
   );
 
   const handleFavoriteClick = useCallback(
@@ -34,9 +36,9 @@ export function IeStartPage({
       const fullUrl = fav.url.startsWith("http")
         ? fav.url
         : `https://${fav.url}`;
-      window.open(fullUrl, "_blank", "noopener,noreferrer");
+      handleNavigate(fullUrl, fav.year || "current");
     },
-    []
+    [handleNavigate]
   );
 
   const renderFavorites = (items: Favorite[]) => {
