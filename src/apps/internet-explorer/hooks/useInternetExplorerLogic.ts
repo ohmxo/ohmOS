@@ -773,36 +773,45 @@ export function useInternetExplorerLogic({
           let urlToLoad = normalizedTargetUrl;
 
           if (newMode === "now") {
-            // If the domain is in the passthrough list, log it
             if (isDirectPassthrough(normalizedTargetUrl)) {
+              // Passthrough domain (search engine) — load directly in iframe
               logDirectPassthrough(normalizedTargetUrl);
-            }
-            // For all domains, load directly without proxy.
-            // The iframe will either work (search engines, passthrough domains)
-            // or fail gracefully, and the error handler offers "Open in Browser".
-            urlToLoad = normalizedTargetUrl;
+              urlToLoad = normalizedTargetUrl;
 
-            // Try to fetch the page title (best-effort, non-blocking)
-            try {
-              const checkRes = await abortableFetch(
-                `/api/iframe-check?mode=check&url=${encodeURIComponent(
-                  normalizedTargetUrl
-                )}&theme=${encodeURIComponent(currentTheme)}`,
-                {
-                  signal: abortController.signal,
-                  timeout: 15000,
-                  retry: { maxAttempts: 1, initialDelayMs: 250 },
+              // Try to fetch the page title (best-effort, non-blocking)
+              try {
+                const checkRes = await abortableFetch(
+                  `/api/iframe-check?mode=check&url=${encodeURIComponent(
+                    normalizedTargetUrl
+                  )}&theme=${encodeURIComponent(currentTheme)}`,
+                  {
+                    signal: abortController.signal,
+                    timeout: 15000,
+                    retry: { maxAttempts: 1, initialDelayMs: 250 },
+                  }
+                );
+                if (abortController.signal.aborted) return;
+
+                const checkData = await checkRes.json();
+                if (checkData.title) {
+                  setPrefetchedTitle(checkData.title);
                 }
-              );
-              if (abortController.signal.aborted) return;
-
-              const checkData = await checkRes.json();
-              if (checkData.title) {
-                setPrefetchedTitle(checkData.title);
+              } catch (error) {
+                if (error instanceof Error && error.name === "AbortError")
+                  return;
+                // Non-fatal — title fetch is best-effort
               }
-            } catch (error) {
-              if (error instanceof Error && error.name === "AbortError") return;
-              // Non-fatal — title fetch is best-effort
+            } else {
+              // Non-passthrough domain — every site blocks iframing, so open
+              // in a new browser tab instead.
+              window.open(normalizedTargetUrl, "_blank", "noopener,noreferrer");
+              // Reset to start page
+              clearIframeLoadTimeout();
+              cancel();
+              if (iframeRef.current) {
+                iframeRef.current.src = "about:blank";
+              }
+              return;
             }
           } else {
             // "past" mode (1996+) — load directly in iframe without Wayback proxy
