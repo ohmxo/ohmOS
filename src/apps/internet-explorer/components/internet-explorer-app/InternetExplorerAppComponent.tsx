@@ -277,6 +277,7 @@ export function InternetExplorerAppComponent({
               handleIframeError={handleIframeError}
               bringInstanceToForeground={bringInstanceToForeground}
               instanceId={instanceId}
+              favorites={favorites}
             />
           </div>
 

@@ -723,8 +723,8 @@ export function useInternetExplorerLogic({
     async (
       targetUrlParam: string = localUrl || url,
       targetYearParam: string = year,
-      forceRegenerate = false,
-      currentHtmlContent: string | null = null
+      _forceRegenerate = false,
+      _currentHtmlContent: string | null = null
     ) => {
       // Check if offline and show error
       if (
@@ -799,168 +799,34 @@ export function useInternetExplorerLogic({
           newMode === "future" ||
           (newMode === "past" && parseInt(targetYearParam) <= 1995)
         ) {
-          // Local caching removed to save localStorage space
+          // Time-travel / AI generation mode — show a placeholder message
+          // until an AI provider key is configured on the server.
+          const placeholderHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Time Travel — Not Configured</title><style>body{font-family:-apple-system,system-ui,sans-serif;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:2rem;text-align:center}p{max-width:400px;line-height:1.6;color:#aaa;font-size:14px}h1{font-size:20px;margin-bottom:0.5rem;color:#fff}code{background:#333;padding:2px 6px;border-radius:3px;font-size:13px}</style></head><body><div><h1>🌌 Time Travel Not Available</h1><p>AI-powered time-travel browsing requires an AI provider key configured on the server. Set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or <code>GOOGLE_GENERATIVE_AI_API_KEY</code> in your environment to enable this feature.</p></div></body></html>`;
 
-          let remoteCacheHit = false;
-          if (!forceRegenerate) {
-            try {
-              log.debug("Checking remote cache", {
-                url: normalizedTargetUrl,
-                year: targetYearParam,
-              });
-              const res = await abortableFetch(
-                `/api/iframe-check?mode=ai&url=${encodeURIComponent(
-                  normalizedTargetUrl
-                )}&year=${targetYearParam}`,
-                {
-                  signal: abortController.signal,
-                  timeout: 15000,
-                  throwOnHttpError: false,
-                  retry: { maxAttempts: 1, initialDelayMs: 250 },
-                }
-              );
-              if (abortController.signal.aborted) return;
-              log.debug("Remote cache response", {
-                status: res.status,
-                ok: res.ok,
-                contentType: res.headers.get("content-type"),
-              });
-
-              if (
-                res.ok &&
-                (res.headers.get("content-type") || "").includes("text/html")
-              ) {
-                remoteCacheHit = true;
-                const html = await res.text();
-                log.debug("Remote cache hit", { htmlLength: html.length });
-                const titleMatch = html.match(/^<!--\s*TITLE:\s*(.*?)\s*-->/);
-                const parsedTitle = titleMatch ? titleMatch[1].trim() : null;
-                const cleanHtml = html.replace(
-                  /^<!--\s*TITLE:.*?-->\s*\n?/,
-                  ""
-                );
-
-                // Local caching removed to save localStorage space
-                // Refresh cached years to update the count
-                fetchCachedYears(normalizedTargetUrl);
-
-                const favicon = `https://www.google.com/s2/favicons?domain=${
-                  new URL(normalizedTargetUrl).hostname
-                }&sz=32`;
-                loadSuccess({
-                  aiGeneratedHtml: cleanHtml,
-                  title: parsedTitle || normalizedTargetUrl,
-                  targetUrl: normalizedTargetUrl,
-                  targetYear: targetYearParam,
-                  favicon,
-                  addToHistory: true,
-                });
-                log.debug("Returning early after remote cache hit");
-                return;
-              } else {
-                log.debug("Remote cache miss or invalid response");
-              }
-            } catch (e) {
-              if (e instanceof Error && e.name === "AbortError") return;
-              console.warn("[IE] AI remote cache fetch failed", e);
-            }
-          }
-
-          if (remoteCacheHit) {
-            console.error(
-              "[IE] Logic error: Should have returned on remote cache hit, but didn't!"
-            );
-            return;
-          }
-
-          log.debug("No cache hit; proceeding to generate", {
-            remoteCacheHit,
-            forceRegenerate,
+          navigateStart(normalizedTargetUrl, targetYearParam, newMode, Date.now());
+          loadSuccess({
+            aiGeneratedHtml: placeholderHtml,
+            title: `Time Travel — ${normalizedTargetUrl}`,
+            targetUrl: normalizedTargetUrl,
+            targetYear: targetYearParam,
+            favicon: `https://www.google.com/s2/favicons?domain=${new URL(normalizedTargetUrl).hostname}&sz=32`,
+            addToHistory: true,
           });
-          if (playElevatorMusic && terminalSoundsEnabled) {
-            playElevatorMusic(newMode);
-          }
-
-          try {
-            await generateFuturisticWebsite(
-              normalizedTargetUrl,
-              targetYearParam,
-              abortController.signal,
-              null,
-              currentHtmlContent
-            );
-            if (abortController.signal.aborted) return;
-          } catch (error) {
-            if (abortController.signal.aborted) return;
-            console.error("[IE] AI generation error:", error);
-            handleNavigationError(
-              {
-                error: true,
-                type: "ai_generation_error",
-                message: t(
-                  "apps.internet-explorer.failedToGenerateFuturisticWebsite"
-                ),
-                details: error instanceof Error ? error.message : String(error),
-              },
-              normalizedTargetUrl
-            );
-            return;
-          }
         } else {
+          // "now" or "past (1996+)" mode — load directly in the iframe
           let urlToLoad = normalizedTargetUrl;
 
-          if (newMode === "past") {
-            try {
-              const waybackUrl = await getWaybackUrl(
-                normalizedTargetUrl,
-                targetYearParam
-              );
-              if (abortController.signal.aborted) return;
-              if (waybackUrl) {
-                urlToLoad = waybackUrl;
-              } else {
-                await generateFuturisticWebsite(
-                  normalizedTargetUrl,
-                  targetYearParam,
-                  abortController.signal,
-                  null,
-                  currentHtmlContent
-                );
-                if (abortController.signal.aborted) return;
-                return;
-              }
-            } catch (waybackError) {
-              if (abortController.signal.aborted) return;
-              console.warn(
-                `[IE] Wayback Machine error for ${normalizedTargetUrl}:`,
-                waybackError
-              );
-              await generateFuturisticWebsite(
-                normalizedTargetUrl,
-                targetYearParam,
-                abortController.signal,
-                null,
-                currentHtmlContent
-              );
-              if (abortController.signal.aborted) return;
-              return;
-            }
-          } else if (newMode === "now") {
-            // Check if domain should bypass proxy
-            const isDirectBypass = isDirectPassthrough(normalizedTargetUrl);
-
-            if (isDirectBypass) {
+          if (newMode === "now") {
+            // If the domain is in the passthrough list, log it
+            if (isDirectPassthrough(normalizedTargetUrl)) {
               logDirectPassthrough(normalizedTargetUrl);
-              urlToLoad = normalizedTargetUrl;
-            } else {
-              // Proxy current year sites through iframe-check
-              urlToLoad = appendIeDebugParams(
-                `/api/iframe-check?url=${encodeURIComponent(
-                  normalizedTargetUrl
-                )}&theme=${encodeURIComponent(currentTheme)}`
-              );
             }
+            // For all domains, load directly without proxy.
+            // The iframe will either work (search engines, passthrough domains)
+            // or fail gracefully, and the error handler offers "Open in Browser".
+            urlToLoad = normalizedTargetUrl;
 
+            // Try to fetch the page title (best-effort, non-blocking)
             try {
               const checkRes = await abortableFetch(
                 `/api/iframe-check?mode=check&url=${encodeURIComponent(
@@ -980,8 +846,11 @@ export function useInternetExplorerLogic({
               }
             } catch (error) {
               if (error instanceof Error && error.name === "AbortError") return;
-              console.warn(`[IE] iframe-check fetch failed:`, error);
+              // Non-fatal — title fetch is best-effort
             }
+          } else {
+            // "past" mode (1996+) — load directly in iframe without Wayback proxy
+            urlToLoad = normalizedTargetUrl;
           }
 
           if (urlToLoad === finalUrl) {
@@ -1403,8 +1272,12 @@ export function useInternetExplorerLogic({
   }, []);
 
   const handleHome = useCallback(() => {
-    handleNavigate("apple.com", "2002");
-  }, [handleNavigate]);
+    // Return to start page — clear iframe and reset state to idle
+    clearIframeLoadTimeout();
+    abortControllerRef.current?.abort();
+    if (iframeRef.current) iframeRef.current.src = "about:blank";
+    cancel();
+  }, [clearIframeLoadTimeout, cancel]);
 
   // Use a ref to prevent duplicate initial navigations
   const initialNavigationRef = useRef(false);
@@ -1487,10 +1360,12 @@ export function useInternetExplorerLogic({
       }
       // --- END NEW ---
 
-      // Proceed with default navigation if no initialData navigation was queued
+      // If no initialData navigation was queued, show the start page
+      // by staying in "idle" state. No auto-navigation needed — the
+      // start page provides search and quick links.
       if (shouldRunDefaultNavigation) {
-        log.debug("Proceeding with default navigation");
-        handleNavigate(url, year, false);
+        log.debug("No initial data — showing start page");
+        // Stay in idle state so the start page renders
       }
     }
   }, [

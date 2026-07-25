@@ -3,37 +3,25 @@ export const helpItems = [
     icon: "🌐",
     title: "Browse the Web",
     description:
-      "Type any URL and use Back, Forward, Refresh, and Stop to navigate.",
+      "Type a URL or search query and press Enter. Search results load in the browser. Click any link to open it in a new tab.",
   },
   {
-    icon: "🌌",
-    title: "Travel Through Time",
+    icon: "🔍",
+    title: "Search Engine",
     description:
-      "Pick any year from 1000 to the far future to see sites as they were — or could be.",
+      "DuckDuckGo is the default search engine. For the best experience, search from the address bar and open result links in your real browser.",
   },
   {
-    icon: "✨",
-    title: "AI History Reimagined",
+    icon: "📌",
+    title: "Favorites & History",
     description:
-      "Pre-1996 pages and future years are reconstructed live by AI in streaming HTML.",
-  },
-  {
-    icon: "⭐",
-    title: "Year-Locked Favorites",
-    description:
-      "Favorite a site at a specific year so it always opens in that exact era.",
-  },
-  {
-    icon: "🔮",
-    title: "Explore Time Nodes",
-    description:
-      "Click the clock in the address bar to jump between cached snapshots of any site.",
+      "Bookmark pages you visit often. Your browsing history is stored locally so you can revisit past sessions.",
   },
   {
     icon: "🔗",
-    title: "Share Your Journey",
+    title: "Share Links",
     description:
-      "Generate a share link that reopens the exact page and year you're viewing.",
+      "Generate a share link that reopens the exact page you're viewing.",
   },
 ];
 

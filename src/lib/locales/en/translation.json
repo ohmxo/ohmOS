@@ -688,6 +688,8 @@
       "favorite": "Favorite",
       "history": "History",
       "search": "Search",
+      "enterUrlOrSearch": "Search the web or enter a URL",
+      "searchOpensInNewTab": "Results open in a new tab",
       "showCachedVersionsTimeMachine": "Show cached versions (Time Machine)",
       "timeNodes": "{{count}} Time Node",
       "timeNodes_plural": "{{count}} Time Nodes",

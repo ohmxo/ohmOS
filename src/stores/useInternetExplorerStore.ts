@@ -15,9 +15,16 @@ export interface Favorite {
 
 // Define a constant for domains that bypass the proxy when in "now" mode
 export const DIRECT_PASSTHROUGH_DOMAINS = [
-  "os.ryo.lu",
-  "hcsimulator.com",
-  "os.rocorgi.wang",
+  // Search engines — embed-friendly
+  "duckduckgo.com",
+  "lite.duckduckgo.com",
+  "html.duckduckgo.com",
+  "start.duckduckgo.com",
+  "google.com",
+  "www.google.com",
+  "bing.com",
+  "www.bing.com",
+  // Sites known to allow iframing
   "iso-city.com",
   "shaoruu.io",
 ];
@@ -68,8 +75,8 @@ export type LocationOption =
   | "russia";
 
 // Default constants
-export const DEFAULT_URL = "https://apple.com";
-export const DEFAULT_YEAR = "2001";
+export const DEFAULT_URL = "https://lite.duckduckgo.com/lite/";
+export const DEFAULT_YEAR = "current";
 
 export const DEFAULT_TIMELINE: { [year: string]: string } = {
   "2030":
@@ -336,7 +343,7 @@ export const DEFAULT_FAVORITES: Favorite[] = [
 ];
 
 // Define the current version for the store
-const CURRENT_IE_STORE_VERSION = 6;
+const CURRENT_IE_STORE_VERSION = 7;
 
 // Helper function to classify year into navigation mode
 function classifyYear(year: string): NavigationMode {

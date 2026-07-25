@@ -5,8 +5,10 @@ import { OfflineEmptyState } from "@/components/shared/OfflineEmptyState";
 import type {
   ErrorResponse,
   NavigationMode,
+  Favorite,
 } from "@/stores/useInternetExplorerStore";
 import { ErrorPage } from "./ErrorPage";
+import { IeStartPage } from "./IeStartPage";
 import { isIeLiveBrowserAvailable } from "@/utils/runtimeConfig";
 import { useOffline } from "@/hooks/useOffline";
 import { getTranslatedAppName } from "@/utils/i18n";
@@ -38,6 +40,7 @@ export interface InternetExplorerContentPaneProps {
   handleIframeError: () => void;
   bringInstanceToForeground: (instanceId: string) => void;
   instanceId: string;
+  favorites: Favorite[];
 }
 
 export function InternetExplorerContentPane({
@@ -67,6 +70,7 @@ export function InternetExplorerContentPane({
   handleIframeError,
   bringInstanceToForeground,
   instanceId,
+  favorites,
 }: InternetExplorerContentPaneProps) {
   const isOffline = useOffline();
 
@@ -88,6 +92,20 @@ export function InternetExplorerContentPane({
       t("apps.internet-explorer.goBackToPreviousPage"),
       t("apps.internet-explorer.tryRefreshingThePage"),
     ];
+
+    // Always offer "Open in Browser" — most sites block iframing,
+    // so this is the primary escape hatch.
+    suggestions.push(
+      <a
+        href={errorDetails.targetUrl || url}
+        target="_blank"
+        rel="noopener noreferrer"
+        role="button"
+        className="text-red-600 underline"
+      >
+        {t("apps.internet-explorer.openInLiveBrowser")}
+      </a>
+    );
 
     // Offer the "live browser" escape hatch only when the server has it
     // configured and the site actively blocked the proxy (auth / bot walls).
@@ -177,6 +195,12 @@ export function InternetExplorerContentPane({
               appletCreatedBy="ryo"
             />
           </div>
+        ) : status === "idle" || status === "error" ? (
+          <IeStartPage
+            favorites={favorites}
+            t={t}
+            currentTheme={currentTheme}
+          />
         ) : (
           <iframe
             ref={iframeRef}

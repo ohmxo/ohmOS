@@ -183,40 +183,41 @@ export function InternetExplorerToolbar({
           handleNavigateWithHistory={handleNavigateWithHistory}
         />
         <div className="flex items-center gap-2">
-          <Select value={year} onValueChange={(newYear) => handleNavigate(url, newYear)}>
-            <SelectTrigger
-              className={
-                isWindowsTheme
-                  ? "!text-[11px]"
-                  : currentTheme === "macosx"
-                    ? "!text-[12px]"
-                    : "!text-[16px]"
-              }
-            >
-              <SelectValue placeholder={t("apps.internet-explorer.year")} />
-            </SelectTrigger>
-            <SelectContent className="px-0">
-              {futureYears.map((y) => (
-                <SelectItem
-                  key={y}
-                  value={y}
-                  className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text text-os-link"
-                >
-                  {y}
-                </SelectItem>
-              ))}
-              <SelectItem
-                value="current"
-                className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text"
+          {year !== "current" && (
+            <Select value={year} onValueChange={(newYear) => handleNavigate(url, newYear)}>
+              <SelectTrigger
+                className={
+                  isWindowsTheme
+                    ? "!text-[11px]"
+                    : currentTheme === "macosx"
+                      ? "!text-[12px]"
+                      : "!text-[16px]"
+                }
               >
-                {t("apps.internet-explorer.now")}
-              </SelectItem>
-              {pastYears.map((y) => (
+                <SelectValue placeholder={t("apps.internet-explorer.year")} />
+              </SelectTrigger>
+              <SelectContent className="px-0">
+                {futureYears.map((y) => (
+                  <SelectItem
+                    key={y}
+                    value={y}
+                    className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text text-os-link"
+                  >
+                    {y}
+                  </SelectItem>
+                ))}
                 <SelectItem
-                  key={y}
-                  value={y}
-                  className={`text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text ${
-                    parseInt(y) <= 1995 ? "text-os-link" : ""
+                  value="current"
+                  className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text"
+                >
+                  {t("apps.internet-explorer.now")}
+                </SelectItem>
+                {pastYears.map((y) => (
+                  <SelectItem
+                    key={y}
+                    value={y}
+                    className={`text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text ${
+                      parseInt(y) <= 1995 ? "text-os-link" : ""
                   }`}
                 >
                   {y}
@@ -224,6 +225,7 @@ export function InternetExplorerToolbar({
               ))}
             </SelectContent>
           </Select>
+          )}
         </div>
       </div>
       <InternetExplorerFavoritesBar
