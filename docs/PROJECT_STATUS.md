@@ -3,6 +3,7 @@
 > **Last updated:** 2026-07-25
 > **Current phase:** Phase 1.5 — Branding Cleanup (Complete)
 > **IE status:** Simplified to start page + new tab launcher
+> **Docs:** Fully migrated from ryOS to ohmOS
 > **Next phase:** Phase 2 — Brand Asset Integration (Awaiting decisions/assets)
 
 ---
@@ -12,8 +13,8 @@
 ```bash
 bun run dev              # Full stack (API + Vite)
 bun run dev:vite         # Frontend only
-bun run typecheck        # TypeScript check
-bun run lint             # ESLint
+bun run typecheck        # TypeScript check (zero errors)
+bun run lint             # ESLint (pre-existing warnings only)
 bun run build            # Production build
 ```
 
@@ -34,8 +35,10 @@ Strip Redis dependency, hide Chats app, configure remotes.
 
 Replace all user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob.
 
-### Commit
-`88895db0a` — Phase 1.5 branding cleanup (48 files)
+### Commits
+- `88895db0a` — Phase 1.5 branding cleanup (48 files)
+- `6da55c770` — AGPL footer wire-up + repo URL fix
+- `cf0b4d8ec` — comprehensive docs migration (443 "ryOS" → "ohmOS" in 63 files)
 
 ### What was changed
 - `index.html` — title, OG/Twitter tags, description → OHMXO
@@ -48,6 +51,8 @@ Replace all user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob.
 - Cursor default video removed
 - Brand mark SVGs, favicon, OG images replaced
 - Cursor brand assets deleted
+- AGPL-3.0 compliance footer with correct repo URL
+- `docs/` — all 63 markdown files migrated, 443 instances of "ryOS" → "ohmOS"
 
 ### Not touched (by design)
 - Internal `ryos:*` localStorage keys, CSS classes, DB names
@@ -83,14 +88,30 @@ IE was reworked because it required a complex backend proxy + AI generation stac
 ### Why it works this way
 No major website allows iframing. Google, DuckDuckGo, Bing, GitHub, Apple all send `X-Frame-Options: DENY/SAMEORIGIN` or `frame-ancestors 'none'/'self'`. The only way to show real web pages in IE is via a server-side proxy that strips frame-blocking headers — which requires the full API backend deployed.
 
-### To restore full browsing
-Reinstate `/api/iframe-check` with a server-side fetch proxy that:
-1. Fetches the upstream URL
-2. Strips `X-Frame-Options` and `frame-ancestors` from the response
-3. Injects a base tag and navigation interceptor script
-4. Returns the modified HTML to the iframe
+---
 
-This is what the original ryOS code did before simplification.
+## .codex/ Project Config
+
+The project now has a `.codex/` folder with project-specific OMX configuration including hooks registry and agent definitions.
+
+---
+
+## AGPL-3.0 Compliance
+
+- `src/components/layout/AgplFooter.tsx` — fixed-bottom footer visible on every screen
+- Wired into `src/App.tsx` alongside ScreenSaverOverlay
+- Links to `https://github.com/ohmxo/ohmOS`
+
+---
+
+## IDE Diagnostics (Non-Blocking)
+
+| Severity | File | Issue |
+|----------|------|-------|
+| Info | `api/tsconfig.json` | `baseUrl` deprecated in TypeScript 7.0 — suppressed with `ignoreDeprecations: "6.0"` |
+| Info | `src/components/debug/DebugLogOverlay.tsx` | Tailwind CSS v4 canonical class suggestions (style-only) |
+| Info | `src/config/appRegistry.tsx` | Biome `useLiteralKeys` suggestions, 2 non-null assertions |
+| Warning | `tests/unit/chat/test-chat-row-render-counts.test.tsx` | Unused `useState`, `prefer-const` |
 
 ---
 

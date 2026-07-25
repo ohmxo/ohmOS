@@ -1,6 +1,6 @@
 # API Reference
 
-ryOS backend APIs use Node-style route handlers in `api/`, served by the standalone Bun API server.
+ohmOS backend APIs use Node-style route handlers in `api/`, served by the standalone Bun API server.
 
 Most actively refactored JSON routes use the shared `apiHandler` utility (`api/_utils/api-handler.ts`) for CORS, method checks, auth resolution, and consistent error handling. Some specialized routes (for example multipart upload handlers) still use explicit/manual handling.
 

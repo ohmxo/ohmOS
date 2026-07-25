@@ -1,6 +1,6 @@
 # Brand Asset Requirements Checklist — OHMXO Identity
 
-> Generated from: DESIGN.md, Ohmxo_Knowledge_Base.md, Works.csv, CV, ohmxo.com/studio, ryOS codebase audit
+> Generated from: DESIGN.md, Ohmxo_Knowledge_Base.md, Works.csv, CV, ohmxo.com/studio, ohmOS codebase audit
 
 **Status key:** ✅ HAVE | ⚠️ PARTIAL | ❌ NEED FROM YOU | 🔲 NOT APPLICABLE
 
@@ -42,7 +42,7 @@ These are needed to complete the basic branding pass and make the OS feel like y
 | Body typeface | ❌ NEED | **Neue Montreal** for body text — also commercial. Need a substitute or license. |
 | Mono typeface | ❌ NEED | **DM Mono** — available on Google Fonts (free), but confirm |
 | Type scale | ✅ HAVE | DESIGN.md section 3 has full fluid scale |
-| OS UI font override | ❌ NEED | For the ryOS theme system, we need to decide what font the OS chrome uses. Currently: Lucida Grande, Chicago, MS Sans Serif. |
+| OS UI font override | ❌ NEED | For the ohmOS theme system, we need to decide what font the OS chrome uses. Currently: Lucida Grande, Chicago, MS Sans Serif. |
 
 **What I need from you:** Which fonts you actually have access to / want to use. Humane and Neue Montreal are commercial — alternatives would be something like Uncut Sans, Inter, or similar open-source options.
 
@@ -78,7 +78,7 @@ These are needed to complete the basic branding pass and make the OS feel like y
 | Copyright line | ✅ HAVE | "© Jacob Adeshiyan. 2024-{current year}" — already set |
 | Privacy policy URL | ❌ NEED | Currently links to `os.ryo.lu/docs/privacy` — do you have one? Or keep default? |
 | Terms of service URL | ❌ NEED | Same — currently `os.ryo.lu/docs/terms` |
-| AGPL license notice | ⚠️ PARTIAL | ryOS is AGPL-3.0. We need to decide how to disclose this on the live site. |
+| AGPL license notice | ⚠️ PARTIAL | ohmOS is AGPL-3.0. We need to decide how to disclose this on the live site. |
 
 ---
 
@@ -97,9 +97,9 @@ These are needed to complete the basic branding pass and make the OS feel like y
 
 | Item | Status | Details |
 |------|--------|---------|
-| System app icons (Finder, Trash, etc.) | ❌ NEED | Currently use ryOS per-theme icon sets (macosx/, win98/, xp/, default/) |
+| System app icons (Finder, Trash, etc.) | ❌ NEED | Currently use ohmOS per-theme icon sets (macosx/, win98/, xp/, default/) |
 | Custom app icons for music apps | ❌ NEED | iPod, Synth, Winamp, Karaoke, Soundboard — could get OHMXO-styled icons |
-| Dock icon set | ❌ NEED | Currently ryOS defaults |
+| Dock icon set | ❌ NEED | Currently ohmOS defaults |
 | Loading / splash screen imagery | ❌ NEED | Currently uses `hello.svg`, `macos.svg`, `xp-boot.gif`, `win98.gif` |
 | Error state illustrations | ❌ NEED | Currently plain text |
 
@@ -142,7 +142,7 @@ These are needed to complete the basic branding pass and make the OS feel like y
 | Custom cursor | ❌ NEED | DESIGN.md mentions "custom red cursor (28px), mix-blend-mode: difference" |
 | Branded 404 page | ❌ NEED | Currently generic |
 | Branded error states | ❌ NEED | Crash dialog, IE error page, etc. |
-| Branded notification sounds | ❌ NEED | Boot sound, error sounds, notification — currently use ryOS sounds |
+| Branded notification sounds | ❌ NEED | Boot sound, error sounds, notification — currently use ohmOS sounds |
 | PWA icons / splash screens | ❌ NEED | Need OHMXO-branded PWA manifest icons |
 | Social media preview cards | ❌ NEED | OG image for Twitter/Facebook when sharing the OS URL |
 | Email templates | ❌ NEED | If account recovery is enabled |

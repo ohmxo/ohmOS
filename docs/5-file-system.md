@@ -178,7 +178,7 @@ interface FileSystemItem {
 
 ## IndexedDB Storage
 
-Database: `ryOS` (version 14)
+Database: `ohmOS` (version 14)
 
 | Object Store | Content Type | Key |
 |--------------|--------------|-----|

@@ -1,6 +1,6 @@
 # Apps
 
-ryOS includes 28 built-in applications, each designed to replicate classic desktop experiences while adding modern functionality.
+ohmOS includes 28 built-in applications, each designed to replicate classic desktop experiences while adding modern functionality.
 
 Registry IDs and docs slugs mostly match; Applet Store is registered as `applet-viewer`, and Virtual PC is registered as `pc`.
 

@@ -1,10 +1,10 @@
 # UI Components and Shared Systems
 
-Overview of shared UI components and system-wide utilities that power the ryOS desktop environment.
+Overview of shared UI components and system-wide utilities that power the ohmOS desktop environment.
 
 ## Overview
 
-The ryOS component architecture is organized into distinct categories, each serving specific purposes across the desktop environment. Components are built with React and TypeScript, leveraging Tailwind CSS for styling and shadcn/ui as the foundation for consistent, accessible UI elements. The system emphasizes reusability, theme-aware components, and cross-app compatibility.
+The ohmOS component architecture is organized into distinct categories, each serving specific purposes across the desktop environment. Components are built with React and TypeScript, leveraging Tailwind CSS for styling and shadcn/ui as the foundation for consistent, accessible UI elements. The system emphasizes reusability, theme-aware components, and cross-app compatibility.
 
 The component library is structured hierarchically: base UI components provide fundamental building blocks, layout components handle window management and desktop structure, dialog components manage modal interactions, shared components offer cross-application utilities, and error components provide crash recovery surfaces. This organization ensures consistent behavior and appearance across all 28 built-in applications while maintaining flexibility for app-specific customizations.
 

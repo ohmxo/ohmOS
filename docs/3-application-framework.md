@@ -1,12 +1,12 @@
 # Application Framework
 
-The ryOS application framework provides a unified system for building and managing desktop-style applications within the browser. It handles window rendering, state management, theming, and app lifecycle, allowing developers to focus on application logic rather than window management infrastructure.
+The ohmOS application framework provides a unified system for building and managing desktop-style applications within the browser. It handles window rendering, state management, theming, and app lifecycle, allowing developers to focus on application logic rather than window management infrastructure.
 
 ## Overview
 
-The ryOS application framework is built around three core pillars: **Window Management**, **State Management**, and **Theme System**. Together, these systems enable apps to have native desktop-like behavior including multiple windows, window positioning, resizing, minimizing, and theming that adapts to different operating system aesthetics.
+The ohmOS application framework is built around three core pillars: **Window Management**, **State Management**, and **Theme System**. Together, these systems enable apps to have native desktop-like behavior including multiple windows, window positioning, resizing, minimizing, and theming that adapts to different operating system aesthetics.
 
-Apps in ryOS are still organized as self-contained modules in `src/apps/[app-name]/`, but app registration is centralized in `src/config/appRegistry.tsx`. The registry combines lightweight app metadata with lazily loaded app components via `createLazyComponent`, so non-critical apps are loaded on demand while core shell behavior stays responsive. The framework handles window lifecycle, state persistence, and theme-aware rendering automatically, while apps focus on their specific functionality.
+Apps in ohmOS are still organized as self-contained modules in `src/apps/[app-name]/`, but app registration is centralized in `src/config/appRegistry.tsx`. The registry combines lightweight app metadata with lazily loaded app components via `createLazyComponent`, so non-critical apps are loaded on demand while core shell behavior stays responsive. The framework handles window lifecycle, state persistence, and theme-aware rendering automatically, while apps focus on their specific functionality.
 
 The framework supports multiple window instances per app (multi-window), allowing users to open several windows of the same application simultaneously. Window state, including position and size, is persisted across sessions. Apps can also define custom window constraints, menu bars, and help content that integrates seamlessly with the system. A universal undo/redo mechanism (`useUndoRedoStore` + `useGlobalUndoRedo`) lets apps like Finder, Paint, TextEdit, and Calendar register instance-scoped undo/redo handlers that are dispatched via `Cmd/Ctrl+Z` to the foreground window. Runtime resilience is handled by desktop-level and app-level error boundaries with crash dialogs that offer both relaunch and quit options, so a crashing app instance does not bring down the full desktop shell.
 

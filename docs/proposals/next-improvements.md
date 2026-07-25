@@ -3,7 +3,7 @@
 Status: **active cleanup roadmap** (several low-risk items shipped; larger
 structural items are either pending PRs or still tracked below)
 
-This document is a point-in-time audit of the ryOS codebase and a prioritized
+This document is a point-in-time audit of the ohmOS codebase and a prioritized
 set of proposals for the next round of refactoring, reliability/performance
 work, hardening, and new features. It is meant to be read top-to-bottom by a
 maintainer deciding what to pick up next; each item is sized by *which

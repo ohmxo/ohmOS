@@ -1,6 +1,6 @@
 # Audio System
 
-Overview of ryOS audio capabilities and architecture.
+Overview of ohmOS audio capabilities and architecture.
 
 ## Technologies
 
@@ -107,7 +107,7 @@ source.stop(0);
 
 ## Audio Playback
 
-ryOS provides multiple audio playback mechanisms:
+ohmOS provides multiple audio playback mechanisms:
 
 ### iPod App
 

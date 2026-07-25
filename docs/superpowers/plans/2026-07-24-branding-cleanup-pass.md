@@ -2,17 +2,17 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace remaining user-facing "ryOS", "Ryo Lu", "ryo.lu", "os.ryo.lu", and "Cursor" (brand) references in locales, settings screens, error/boot screens, default contacts, and bookmarks with OHMXO/Jacob equivalents.
+**Goal:** Replace remaining user-facing "ohmOS", "Ryo Lu", "ryo.lu", "os.ryo.lu", and "Cursor" (brand) references in locales, settings screens, error/boot screens, default contacts, and bookmarks with OHMXO/Jacob equivalents.
 
 **Architecture:** Content-only string replacements in i18n JSON files and React components. No theme, color, layout, or app structural changes. No CSS, no internal keys, no repo attribution, no database names.
 
 **Tech Stack:** React 19, i18next, TypeScript, Zustand
 
-**Scope boundary:** Do NOT touch internal `ryos:*` localStorage keys, `[ryOS]` console prefixes, `ryos-*` CSS classes, `data-ryos-*` DOM attributes, `github: "ryokun6/ryos"` attribution, `DB_NAME = "ryOS"`, or `window.ryosDesktop` references.
+**Scope boundary:** Do NOT touch internal `ryos:*` localStorage keys, `[ohmOS]` console prefixes, `ryos-*` CSS classes, `data-ryos-*` DOM attributes, `github: "ryokun6/ryos"` attribution, `DB_NAME = "ohmOS"`, or `window.ryosDesktop` references.
 
 ---
 
-### Task 1: i18n Shell JSON — Replace "ryOS" References
+### Task 1: i18n Shell JSON — Replace "ohmOS" References
 
 **Files:**
 - Modify: `src/lib/locales/en/shell.json` — ~20 keys
@@ -22,36 +22,36 @@
 
 | Key | Old value | New value |
 |-----|-----------|-----------|
-| `system.updatingToRyOS` | `"Updating to ryOS {{version}}…"` | `"Updating OHMXO to {{version}}…"` |
-| `system.updatingToRyOSWithBuild` | `"Updating to ryOS {{version}} ({{buildNumber}})…"` | `"Updating OHMXO to {{version}} ({{buildNumber}})…"` |
-| `system.resetAllSettingsDesc` | `"...ryOS will restart after reset."` | `"...OHMXO will restart after reset."` |
-| `system.formatFileSystemDesc` | `"...ryOS will restart after format."` | `"...OHMXO will restart after format."` |
-| `errorBoundaries.desktopDescription` | `"Reload ryOS to restore the Dock, Desktop, and menu bar."` | `"Reload to restore the Dock, Desktop, and menu bar."` |
+| `system.updatingToRyOS` | `"Updating to ohmOS {{version}}…"` | `"Updating OHMXO to {{version}}…"` |
+| `system.updatingToRyOSWithBuild` | `"Updating to ohmOS {{version}} ({{buildNumber}})…"` | `"Updating OHMXO to {{version}} ({{buildNumber}})…"` |
+| `system.resetAllSettingsDesc` | `"...ohmOS will restart after reset."` | `"...OHMXO will restart after reset."` |
+| `system.formatFileSystemDesc` | `"...ohmOS will restart after format."` | `"...OHMXO will restart after format."` |
+| `errorBoundaries.desktopDescription` | `"Reload ohmOS to restore the Dock, Desktop, and menu bar."` | `"Reload to restore the Dock, Desktop, and menu bar."` |
 | `startMenu.ryosProfessional` | `"Professional"` | `"Professional"` (key name kept, value unchanged — displayed as "OHMXO Professional" via StartMenu.tsx) |
 | `startMenu.ryos98` | `"98"` | `"98"` (same — displayed as "OHMXO 98") |
-| `assistant.greetings.help` | `"It looks like you're using ryOS! Need a hand..."` | `"Need a hand with anything? I'm {{name}}, happy to help. 📎"` |
-| `aboutThisMac.description` | `"Information about ryOS on this computer"` | `"Information about this computer"` |
-| `toast.updateReady` | `"Update ready for ryOS {{version}} ({{buildNumber}})"` | `"Update ready for OHMXO {{version}} ({{buildNumber}})"` |
-| `toast.alreadyLatestVersionDetail` | `"ryOS {{version}} ({{buildNumber}})"` | `"OHMXO {{version}} ({{buildNumber}})"` |
-| `toast.desktopAvailable` | `"ryOS {{version}} for {{platform}} is available"` | `"OHMXO {{version}} for {{platform}} is available"` |
-| `toast.desktopAppOffer` | `"ryOS is available as a {{platform}} app"` | `"OHMXO is available as a {{platform}} app"` |
-| `login.dialogTitle` | `"Sign In to ryOS"` | `"Sign In"` |
-| `codePreview.title` | `"ryOS Code Preview"` | `"Code Preview"` |
-| `codePreview.titleFullscreen` | `"ryOS Code Preview Fullscreen"` | `"Code Preview Fullscreen"` |
-| `spotlight.placeholder` | `"Search ryOS"` | `"Search"` |
-| `language.languageExplanation` | `"Select your preferred language for ryOS interface"` | `"Select your preferred language"` |
+| `assistant.greetings.help` | `"It looks like you're using ohmOS! Need a hand..."` | `"Need a hand with anything? I'm {{name}}, happy to help. 📎"` |
+| `aboutThisMac.description` | `"Information about ohmOS on this computer"` | `"Information about this computer"` |
+| `toast.updateReady` | `"Update ready for ohmOS {{version}} ({{buildNumber}})"` | `"Update ready for OHMXO {{version}} ({{buildNumber}})"` |
+| `toast.alreadyLatestVersionDetail` | `"ohmOS {{version}} ({{buildNumber}})"` | `"OHMXO {{version}} ({{buildNumber}})"` |
+| `toast.desktopAvailable` | `"ohmOS {{version}} for {{platform}} is available"` | `"OHMXO {{version}} for {{platform}} is available"` |
+| `toast.desktopAppOffer` | `"ohmOS is available as a {{platform}} app"` | `"OHMXO is available as a {{platform}} app"` |
+| `login.dialogTitle` | `"Sign In to ohmOS"` | `"Sign In"` |
+| `codePreview.title` | `"ohmOS Code Preview"` | `"Code Preview"` |
+| `codePreview.titleFullscreen` | `"ohmOS Code Preview Fullscreen"` | `"Code Preview Fullscreen"` |
+| `spotlight.placeholder` | `"Search ohmOS"` | `"Search"` |
+| `language.languageExplanation` | `"Select your preferred language for ohmOS interface"` | `"Select your preferred language"` |
 
 Also replace:
 - `"Send logs to Cursor agent"` → `"Send logs to debug agent"` (key `debug.sendLogs`)
 - `"Cursor Cloud agent"` / `"Open agent in Cursor"` references → `"Cloud agent"` / `"Open agent"` (keys `cursorCloud.*`)
 
-- [ ] **Step 1: Edit shell.json** — replace all "ryOS" strings in user-facing values per the table above
+- [ ] **Step 1: Edit shell.json** — replace all "ohmOS" strings in user-facing values per the table above
 - [ ] **Step 2: Edit shell.json** — replace "Cursor" brand references in debug/agent strings
-- [ ] **Step 3: Verify** — `grep '"ryOS"\|"Cursor"' src/lib/locales/en/shell.json` returns no remaining user-facing hits
+- [ ] **Step 3: Verify** — `grep '"ohmOS"\|"Cursor"' src/lib/locales/en/shell.json` returns no remaining user-facing hits
 
 ---
 
-### Task 2: i18n Translation JSON — Replace "ryOS" References
+### Task 2: i18n Translation JSON — Replace "ohmOS" References
 
 **Files:**
 - Modify: `src/lib/locales/en/translation.json` — ~15 keys
@@ -60,90 +60,90 @@ Also replace:
 
 | Key | Old value | New value |
 |-----|-----------|-----------|
-| `internet-explorer.pageLoadTimedOut` | `"...Internet Explorer stopped waiting to keep ryOS responsive."` | `"...Internet Explorer stopped waiting to keep the system responsive."` |
-| `chats.help.chatWithRyo.description` | `"Ask anything — Ryo can write code, summarize docs, or explain ryOS features."` | `"Ask anything — write code, summarize docs, or explore the system."` |
-| `chats.help.loginToRyOS` | `"Sign in to ryOS"` | `"Sign in"` |
+| `internet-explorer.pageLoadTimedOut` | `"...Internet Explorer stopped waiting to keep ohmOS responsive."` | `"...Internet Explorer stopped waiting to keep the system responsive."` |
+| `chats.help.chatWithRyo.description` | `"Ask anything — Ryo can write code, summarize docs, or explain ohmOS features."` | `"Ask anything — write code, summarize docs, or explore the system."` |
+| `chats.help.loginToRyOS` | `"Sign in to ohmOS"` | `"Sign in"` |
 | `chats.help.chatGreeting` | `"Sign in to continue chatting with Ryo."` | `"Sign in to continue chatting."` |
-| `videos.description` | `"Paste any YouTube URL and ryOS fetches the metadata..."` | `"Paste any YouTube URL to fetch metadata into your playlist"` |
-| `finder.helpItems.airdrop` | `"...AirDrop it to nearby ryOS users instantly"` | `"...AirDrop it to nearby users instantly"` |
-| `ipod.helpItems.ryosLinks` | `"YouTube songs share ryOS links..."` | `"YouTube songs share links..."` |
-| `calculator.helpItems.ryosAPI` | `"...through the ryOS API"` | `"...through the API"` |
+| `videos.description` | `"Paste any YouTube URL and ohmOS fetches the metadata..."` | `"Paste any YouTube URL to fetch metadata into your playlist"` |
+| `finder.helpItems.airdrop` | `"...AirDrop it to nearby ohmOS users instantly"` | `"...AirDrop it to nearby users instantly"` |
+| `ipod.helpItems.ryosLinks` | `"YouTube songs share ohmOS links..."` | `"YouTube songs share links..."` |
+| `calculator.helpItems.ryosAPI` | `"...through the ohmOS API"` | `"...through the API"` |
 
-- [ ] **Step 1: Edit translation.json** — replace all "ryOS" strings per table
-- [ ] **Step 2: Verify** — `grep '"ryOS"' src/lib/locales/en/translation.json` returns no remaining user-facing hits
+- [ ] **Step 1: Edit translation.json** — replace all "ohmOS" strings per table
+- [ ] **Step 2: Verify** — `grep '"ohmOS"' src/lib/locales/en/translation.json` returns no remaining user-facing hits
 
 ---
 
-### Task 3: Bouncing Screensaver — Replace "ryOS" Text
+### Task 3: Bouncing Screensaver — Replace "ohmOS" Text
 
 **Files:**
 - Modify: `src/components/screensavers/BouncingLogo.tsx:152-164`
 
-**Change:** The SVG text element renders "ryOS" as falling text. Replace with "OHMXO".
+**Change:** The SVG text element renders "ohmOS" as falling text. Replace with "OHMXO".
 
 ```diff
-- {/* ryOS logo */}
+- {/* ohmOS logo */}
 + {/* OHMXO logo */}
  <text ...>
--  ryOS
+-  ohmOS
 +  OHMXO
  </text>
 ```
 
 - [ ] **Step 1: Edit BouncingLogo.tsx** — replace SVG text content
-- [ ] **Step 2: Verify** — `grep "ryOS" src/components/screensavers/BouncingLogo.tsx` returns nothing
+- [ ] **Step 2: Verify** — `grep "ohmOS" src/components/screensavers/BouncingLogo.tsx` returns nothing
 
 ---
 
-### Task 4: ScreenSaverPicker Preview — Replace "ryOS" Text
+### Task 4: ScreenSaverPicker Preview — Replace "ohmOS" Text
 
 **Files:**
 - Modify: `src/apps/control-panels/components/ScreenSaverPicker.tsx:118`
 
-**Change:** The canvas `fillText("ryOS", ...)` in the bouncing-logo preview thumbnail.
+**Change:** The canvas `fillText("ohmOS", ...)` in the bouncing-logo preview thumbnail.
 
 ```diff
-- ctx.fillText("ryOS", x - 15, y + 5);
+- ctx.fillText("ohmOS", x - 15, y + 5);
 + ctx.fillText("OHMXO", x - 20, y + 5);
 ```
 
 (Note: "OHMXO" is slightly wider, so adjust x offset from -15 to -20 for centering.)
 
 - [ ] **Step 1: Edit ScreenSaverPicker.tsx** — replace canvas fillText
-- [ ] **Step 2: Verify** — `grep "ryOS" src/apps/control-panels/components/ScreenSaverPicker.tsx` returns nothing
+- [ ] **Step 2: Verify** — `grep "ohmOS" src/apps/control-panels/components/ScreenSaverPicker.tsx` returns nothing
 
 ---
 
-### Task 5: ErrorBoundaries — Replace "ryOS" Labels
+### Task 5: ErrorBoundaries — Replace "ohmOS" Labels
 
 **Files:**
 - Modify: `src/components/errors/ErrorBoundaries.tsx:391,397`
 
 **Changes:**
 ```diff
-- titleBarLabel="ryOS"
+- titleBarLabel="ohmOS"
 + titleBarLabel="OHMXO"
 ```
 And the description text (already handled via i18n in Task 1, but has a hardcoded default):
 ```diff
-- "Reload ryOS to restore the Dock, Desktop, and menu bar."
+- "Reload ohmOS to restore the Dock, Desktop, and menu bar."
 + "Reload to restore the Dock, Desktop, and menu bar."
 ```
 This is the `defaultValue` in the `t()` call — the actual localized value comes from shell.json (Task 1).
 
 - [ ] **Step 1: Edit ErrorBoundaries.tsx** — replace `titleBarLabel` and `defaultValue` text
-- [ ] **Step 2: Verify** — `grep "ryOS" src/components/errors/ErrorBoundaries.tsx` returns nothing
+- [ ] **Step 2: Verify** — `grep "ohmOS" src/components/errors/ErrorBoundaries.tsx` returns nothing
 
 ---
 
-### Task 6: VersionDisplay — Replace "ryOS" and os.ryo.lu URL
+### Task 6: VersionDisplay — Replace "ohmOS" and os.ryo.lu URL
 
 **Files:**
 - Modify: `src/apps/control-panels/components/control-panels-app/VersionDisplay.tsx:18,25`
 
 **Changes:**
 ```diff
-- ryOS {displayVersion}
+- ohmOS {displayVersion}
 + OHMXO {displayVersion}
 ```
 ```diff
@@ -152,25 +152,25 @@ This is the `defaultValue` in the `t()` call — the actual localized value come
 ```
 
 - [ ] **Step 1: Edit VersionDisplay.tsx** — replace text and URL
-- [ ] **Step 2: Verify** — `grep "ryOS\|os.ryo.lu"` on this file returns nothing
+- [ ] **Step 2: Verify** — `grep "ohmOS\|os.ryo.lu"` on this file returns nothing
 
 ---
 
-### Task 7: AccountProfileHeader — Replace "ryOS Account"
+### Task 7: AccountProfileHeader — Replace "ohmOS Account"
 
 **Files:**
 - Modify: `src/apps/control-panels/components/control-panels-app/AccountProfileHeader.tsx:104,110`
 
-The `alt` text and heading both use i18n key `apps.control-panels.ryOSAccount`. Find this key in the locales and change the value.
+The `alt` text and heading both use i18n key `apps.control-panels.ohmOSAccount`. Find this key in the locales and change the value.
 
 **Files:**
-- Modify: `src/lib/locales/en/shell.json` — find key `apps.control-panels.ryOSAccount` and change `"ryOS Account"` → `"Account"`
+- Modify: `src/lib/locales/en/shell.json` — find key `apps.control-panels.ohmOSAccount` and change `"ohmOS Account"` → `"Account"`
 
 (Note: also check `src/lib/locales/en/translation.json` for the same key.)
 
-- [ ] **Step 1: Search for `ryOSAccount` key** — `grep -r "ryOSAccount" src/lib/locales/` to find all occurrences
-- [ ] **Step 2: Edit locale files** — change value from `"ryOS Account"` to `"Account"` (or `"OHMXO Account"`)
-- [ ] **Step 3: Verify** — `grep "ryOSAccount"` values no longer contain "ryOS"
+- [ ] **Step 1: Search for `ohmOSAccount` key** — `grep -r "ohmOSAccount" src/lib/locales/` to find all occurrences
+- [ ] **Step 2: Edit locale files** — change value from `"ohmOS Account"` to `"Account"` (or `"OHMXO Account"`)
+- [ ] **Step 3: Verify** — `grep "ohmOSAccount"` values no longer contain "ohmOS"
 
 ---
 
@@ -217,7 +217,7 @@ The `DEFAULT_RYO_CONTACT_DRAFT` is a pre-filled contact template shown to new us
 + { title: "OHMXO", url: "https://ohmxo.com", ... }
 ```
 ```diff
-- { title: "ryOS Docs", url: "https://os.ryo.lu/docs", ... }
+- { title: "ohmOS Docs", url: "https://os.ryo.lu/docs", ... }
 + { title: "Docs", url: "https://ohmxo.com/docs", ... }
 ```
 ```diff
@@ -258,7 +258,7 @@ The `DEFAULT_RYO_CONTACT_DRAFT` is a pre-filled contact template shown to new us
 
 ---
 
-### Task 11: Applet-Related "ryOS" References
+### Task 11: Applet-Related "ohmOS" References
 
 **Files:**
 - Modify: `src/apps/applet-viewer/components/AppletViewerMenuBar.tsx:251`
@@ -267,17 +267,17 @@ The `DEFAULT_RYO_CONTACT_DRAFT` is a pre-filled contact template shown to new us
 - Modify: `src/components/dialogs/TelegramLinkDialog.tsx:111`
 
 **Changes:**
-- `AppletViewerMenuBar.tsx`: i18n key value `"ryOS App"` → `"Applet"` (find key in locale, change value)
-- `useAppletViewerLogic.ts`: `"ryOS Applet"` → `"OHMXO Applet"`
-- `appletImportExport.ts`: `"ryOS Applet"` → `"OHMXO Applet"`
-- `TelegramLinkDialog.tsx`: `alt="ryOS"` → `alt="OHMXO"`
+- `AppletViewerMenuBar.tsx`: i18n key value `"ohmOS App"` → `"Applet"` (find key in locale, change value)
+- `useAppletViewerLogic.ts`: `"ohmOS Applet"` → `"OHMXO Applet"`
+- `appletImportExport.ts`: `"ohmOS Applet"` → `"OHMXO Applet"`
+- `TelegramLinkDialog.tsx`: `alt="ohmOS"` → `alt="OHMXO"`
 
-- [ ] **Step 1: Search for affected i18n keys** — `grep -r "ryosApp\|ryOSApp" src/lib/locales/`
+- [ ] **Step 1: Search for affected i18n keys** — `grep -r "ryosApp\|ohmOSApp" src/lib/locales/`
 - [ ] **Step 2: Edit locale files** — change values
 - [ ] **Step 3: Edit useAppletViewerLogic.ts** — replace filter string
 - [ ] **Step 4: Edit appletImportExport.ts** — replace filter string
 - [ ] **Step 5: Edit TelegramLinkDialog.tsx** — replace alt text
-- [ ] **Step 6: Verify** — check each file for remaining "ryOS" text
+- [ ] **Step 6: Verify** — check each file for remaining "ohmOS" text
 
 ---
 
@@ -298,6 +298,6 @@ These are no longer referenced by any code after the CursorBrandMark component w
 ### Task 13: Final Validation
 
 - [ ] **Step 1: Run `bun run typecheck`** — ensure no TypeScript errors
-- [ ] **Step 2: Quick grep sweep** — `grep -rn '"ryOS"\|"ryos"' src/lib/locales/en/` — only acceptable hits are the `ryosProfessional`/`ryos98`/`ryosApp`/`ryOSAccount` key names (not values)
+- [ ] **Step 2: Quick grep sweep** — `grep -rn '"ohmOS"\|"ryos"' src/lib/locales/en/` — only acceptable hits are the `ryosProfessional`/`ryos98`/`ryosApp`/`ohmOSAccount` key names (not values)
 - [ ] **Step 3: Quick grep sweep** — `grep -rn '"Ryo Lu"\|"me@ryo.lu"\|"os.ryo.lu"\|"ryo.lu"\|"cursor.sh"\|"cursor-cube-2d"' src/` — should return no user-facing hits
 - [ ] **Step 4: Summary** — report what was changed and what was intentionally left untouched

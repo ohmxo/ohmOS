@@ -40,7 +40,7 @@ graph TD
 | `generateHtml` | Create HTML applets with title and emoji icon |
 | `aquarium` | Render interactive emoji aquarium in chat |
 | `list` | List VFS items: `/Applets`, `/Documents` (includes document names), `/Applications`, `/Music`, `/Applets Store` |
-| `mapsSearchPlaces` | Server-side Apple MapKit place search; chat shows an inline card — tapping a result opens **Maps** in ryOS with that place selected; external link opens Apple Maps. For "near me" queries, call `getPreciseLocation` first and pass coordinates as `near`; otherwise the server biases to IP geolocation |
+| `mapsSearchPlaces` | Server-side Apple MapKit place search; chat shows an inline card — tapping a result opens **Maps** in ohmOS with that place selected; external link opens Apple Maps. For "near me" queries, call `getPreciseLocation` first and pass coordinates as `near`; otherwise the server biases to IP geolocation |
 | `getWeather` | Server-side Open-Meteo current weather + 5-day forecast (same live data as the weather widget and weather wallpaper); resolves location from place name, coordinates (e.g. from `getPreciseLocation`), or IP geolocation fallback |
 | `getPreciseLocation` | Request precise device location via in-chat Allow / Don't Allow permission card (client, approval-gated); returns coordinates and locality for `getWeather` or `mapsSearchPlaces` (`near`); web chat only |
 | `open` | Open files/apps/media from virtual file system |
@@ -96,7 +96,7 @@ sequenceDiagram
     participant API as /api/chat
     participant M as AI Model
     participant T as Tool Runtime
-    participant S as ryOS State
+    participant S as ohmOS State
 
     U->>C: Send message
     C->>API: POST messages + systemState
@@ -188,7 +188,7 @@ Channel-specific prompt composition (via `ryo-conversation.ts`):
 
 ## Memory System
 
-ryOS uses a two-tier Redis-backed memory model:
+ohmOS uses a two-tier Redis-backed memory model:
 
 ### Tier 1: Daily Notes (journal memory)
 
