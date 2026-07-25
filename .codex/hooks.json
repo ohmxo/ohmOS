@@ -1,0 +1,26 @@
+{
+  "description": "ohmOS project-specific OMX hooks",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "file",
+        "path": ".codex/hooks/user-prompt-submit.sh",
+        "description": "Keyword detection and skill routing for ohmOS"
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "file",
+        "path": ".codex/hooks/session-start.sh",
+        "description": "Session initialization for ohmOS projects"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "file",
+        "path": ".codex/hooks/pre-tool-use.sh",
+        "description": "Guardrails for ohmOS project operations"
+      }
+    ]
+  }
+}
