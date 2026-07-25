@@ -14,15 +14,6 @@ export interface Favorite {
 
 // Define a constant for domains that bypass the proxy when in "now" mode
 export const DIRECT_PASSTHROUGH_DOMAINS = [
-  // Search engines — embed-friendly
-  "duckduckgo.com",
-  "lite.duckduckgo.com",
-  "html.duckduckgo.com",
-  "start.duckduckgo.com",
-  "google.com",
-  "www.google.com",
-  "bing.com",
-  "www.bing.com",
   // Sites known to allow iframing
   "iso-city.com",
   "shaoruu.io",
