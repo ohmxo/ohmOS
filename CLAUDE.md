@@ -43,7 +43,7 @@ functions under `api/`, or the Bun standalone server for self-host.
 - App roster: preserved as inherited (27 apps). All visible except Chats.
 - Branding: all user-facing "ryOS" → "OHMXO" in Phase 1.5. Internal keys/classes untouched.
 - IE: simplified to start page + new tab launcher. No iframe loading. Store version 8.
-- Fork: `origin` → `ohmxo/ryos`, `upstream` → `ryokun6/ryos`. Push to `origin` to publish,
+- Fork: `origin` → `ohmxo/ohmOS`, `upstream` → `ryokun6/ryos`. Push to `origin` to publish,
   pull from `upstream` for updates.
 - Documentation: TASK.md is the session handoff source of truth. PROJECT_STATUS.md tracks
   phased migration progress. README.md is the public-facing overview.

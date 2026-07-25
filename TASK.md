@@ -78,10 +78,10 @@ From `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`:
 
 ## Project State
 
-All work on `main` branch, pushed to `origin` (ohmxo/ryos).
+All work on `main` branch, pushed to `origin` (ohmxo/ohmOS).
 
 ```
-origin → https://github.com/ohmxo/ryos.git
+origin → https://github.com/ohmxo/ohmOS.git
 upstream → https://github.com/ryokun6/ryos.git
 ```
 

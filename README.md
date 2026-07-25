@@ -108,7 +108,7 @@ The chat endpoint (`/api/chat`) is wired but requires an AI provider key to func
 ## Remotes
 
 ```
-origin   → https://github.com/ohmxo/ryos.git  (ohmxo fork)
+origin   → https://github.com/ohmxo/ohmOS.git  (ohmxo fork)
 upstream → https://github.com/ryokun6/ryos.git (original ryOS)
 ```
 

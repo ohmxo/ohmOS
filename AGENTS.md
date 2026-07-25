@@ -134,7 +134,7 @@ bun run dev:api && bun run test:api  # API tests (server required)
 
 ## Branching
 
-- `main` — deployable, pushed to ohmxo/ryos
+- `main` — deployable, pushed to ohmxo/ohmOS
 - `upstream/main` — original ryOS, merged periodically
 
 ```bash
