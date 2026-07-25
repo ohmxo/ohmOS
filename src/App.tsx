@@ -32,6 +32,7 @@ import { WallpaperAccentRunner } from "@/hooks/WallpaperAccentRunner";
 import { MediaCoreRunner } from "@/hooks/MediaCoreRunner";
 import { DesktopCornerMask } from "@/components/layout/desktop/DesktopCornerMask";
 import { installNativeToastNotifications } from "@/utils/nativeToastNotifications";
+import { AgplFooter } from "@/components/layout/AgplFooter";
 import { createClientLogger } from "@/utils/logger";
 
 // Code-split: the debug overlay (console/network panels + live dashboard) is
@@ -301,6 +302,7 @@ export function App() {
       <WallpaperAccentRunner />
       <MediaCoreRunner />
       <ScreenSaverOverlay />
+      <AgplFooter />
       {debugMode && (
         <Suspense fallback={null}>
           <DebugLogOverlay />
