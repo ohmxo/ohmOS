@@ -1,7 +1,8 @@
 # OHMXO Migration — Project Status
 
-> **Last updated:** 2026-07-24
+> **Last updated:** 2026-07-25
 > **Current phase:** Phase 1.5 — Branding Cleanup (Complete)
+> **IE status:** Simplified to start page + new tab launcher
 > **Next phase:** Phase 2 — Brand Asset Integration (Awaiting decisions/assets)
 
 ---
@@ -9,7 +10,6 @@
 ## Quick Reference
 
 ```bash
-# Development
 bun run dev              # Full stack (API + Vite)
 bun run dev:vite         # Frontend only
 bun run typecheck        # TypeScript check
@@ -23,116 +23,74 @@ bun run build            # Production build
 
 Strip Redis dependency, hide Chats app, configure remotes.
 
-### Changes
-- Redis neutralized via `NoopRedisAdapter` in `api/_utils/redis.ts` — all Redis calls return empty/default values
-- Chats app hidden via `hidden: true` in `src/config/appRegistry.tsx`
-- Assistant overlay removed from `AppManagerView.tsx`
-- Remotes configured: `origin` → ohmxo/ryos, `upstream` → ryokun6/ryos
-- Docs updated: `ARCHITECTURE.md`, `CLAUDE.md`, `PLAN.md`, `REDIS_REMOVAL.md`
-
-### Files modified
+### Key files
 - `api/_utils/redis.ts` — NoopRedisAdapter
 - `api/_utils/api-handler.ts` — safe Redis import
 - `src/config/appRegistry.tsx` — chats hidden
-- Various documentation files
 
 ---
 
-## Phase 1.5 — User-Facing Branding Cleanup (Complete ✅)
+## Phase 1.5 — Branding Cleanup (Complete ✅)
 
-Replace user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob. Content-only — no themes, colors, layouts, or app structural changes.
+Replace all user-facing ryOS/Ryo/Cursor references with OHMXO/Jacob.
 
-### Commits
-- `88895db0a` — Phase 1.5 branding cleanup (48 files)
-- `79e6e0432` — docs: add PROJECT_STATUS.md
+### Commit
+`88895db0a` — Phase 1.5 branding cleanup (48 files)
 
-### Files modified
+### What was changed
+- `index.html` — title, OG/Twitter tags, description → OHMXO
+- `package.json` — productName, description, author, homepage → OHMXO
+- Boot screen, About dialogs, error screens, Start Menu → OHMXO
+- `shell.json` — 20+ ryOS strings → OHMXO, Cursor → debug agent
+- App metadata descriptions — "ryOS" removed from all
+- Default contacts → Jacob/OHMXO (not Ryo Lu/Cursor)
+- IE bookmarks → OHMXO, Docs, GitHub (not ryo.lu/os.ryo.lu)
+- Cursor default video removed
+- Brand mark SVGs, favicon, OG images replaced
+- Cursor brand assets deleted
 
+### Not touched (by design)
+- Internal `ryos:*` localStorage keys, CSS classes, DB names
+- AI assistant "Ryo" name (pending OHMXO identity decision)
+- App metadata creator credits ("Ryo Lu")
+- `os.ryo.lu` internal config URLs
+
+---
+
+## Internet Explorer — Simplified
+
+IE was reworked because it required a complex backend proxy + AI generation stack.
+
+### What changed
 | File | Change |
 |------|--------|
-| `index.html` | Title, OG/Twitter tags, description, site name → OHMXO |
-| `package.json` | productName, description, author, homepage → OHMXO/Jacob |
-| `src/components/dialogs/BootScreen.tsx` | ryOS X → OHMXO (Aqua), ry→OH OS→MXO (System 7) |
-| `src/components/dialogs/AboutFinderDialog.tsx` | ryOS heading, © Ryo Lu → © Jacob |
-| `src/components/dialogs/AboutDialog.tsx` | os.ryo.lu → ohmxo.com URL |
-| `src/components/layout/StartMenu.tsx` | ryOS → OHMXO in Windows sidebar |
-| `src/components/shared/CursorBrandMark.tsx` | Cursor cube → OHMXO brand mark SVGs |
-| `src/lib/locales/en/shell.json` | 20+ ryOS strings → OHMXO; Cursor → debug/cloud agent |
-| `src/apps/finder/metadata.ts` | "ryOS users" → "users" |
-| `src/apps/chats/metadata.ts` | "ryOS features" → "the system" |
-| `src/apps/videos/metadata.ts` | "ryOS fetches" → simplified |
-| `src/apps/ipod/metadata.ts` | "ryOS links" → "links" |
-| `src/apps/calculator/metadata.ts` | "ryOS API" → "the API" |
-| `src/apps/books/metadata.ts` | "Sign in to ryOS" → "Sign in" |
-| `src/components/screensavers/BouncingLogo.tsx` | ryOS → OHMXO SVG text |
-| `src/apps/control-panels/components/ScreenSaverPicker.tsx` | ryOS → OHMXO canvas text |
-| `src/components/errors/ErrorBoundaries.tsx` | ryOS title → OHMXO |
-| `src/apps/control-panels/.../VersionDisplay.tsx` | ryOS → OHMXO, os.ryo.lu → ohmxo.com |
-| `src/utils/contacts.ts` | Ryo Lu → Jacob, Cursor → OHMXO, ryo.lu → ohmxo.com |
-| `src/stores/useInternetExplorerStore.ts` | Bookmarks: Ryo→OHMXO, ryOS Docs→Docs, Cursor→GitHub |
-| `src/stores/useVideoStore.ts` | Removed Cursor channel default video |
-| `src/apps/applet-viewer/hooks/useAppletViewerLogic.ts` | ryOS→OHMXO filter label |
-| `src/utils/appletImportExport.ts` | ryOS→OHMXO filter label |
-| `src/components/dialogs/TelegramLinkDialog.tsx` | ryOS→OHMXO alt text |
+| `IeStartPage.tsx` | New — local start page with search box + favorites grid |
+| `useInternetExplorerLogic.ts` | ~250 lines removed — all proxy/Wayback/AI logic dropped. Navigation opens non-passthrough URLs in new tab |
+| `InternetExplorerUrlBar.tsx` | Non-URL text → DuckDuckGo new tab. Search suggestions → DuckDuckGo new tab |
+| `InternetExplorerContentPane.tsx` | Start page on idle, error page with "Open in Browser" button |
+| `InternetExplorerToolbar.tsx` | Year selector hidden by default |
+| `useInternetExplorerStore.ts` | Store v8 with migration reset. Passthrough domains reduced (every site blocks iframes) |
+| `metadata.ts` | Help items updated for search engine focus |
 
-### Assets created/replaced
-- `public/brands/ohmxo-mark-light.svg` — OHMXO brand mark (light bg)
-- `public/brands/ohmxo-mark-dark.svg` — OHMXO brand mark (dark bg)
-- `public/brands/ohmxo-nav-logo.svg` — OHMXO nav logo (downloaded from ohmxo.com)
-- `public/favicon-32.png` — OHMXO favicon
-- `public/apple-touch-icon.png` — Replaced with OHMXO icon
-- `public/icons/mac-512.png` — Replaced with OHMXO OG image
-- `public/icons/mac-192.png` — Replaced with OHMXO icon
-- `public/brands/cursor-cube-2d-*.svg` — Deleted (orphaned)
+### Current behavior
+- **Start page** renders on cold start — search box + favorites grid
+- **Type a search query** → DuckDuckGo in new tab
+- **Type a URL** → opens in new tab, returns to start page
+- **Click a favorite** → opens in new tab
+- **No iframe errors** — nothing loads in the iframe (every site blocks iframing)
+- **Time-travel** shows "not configured" placeholder
 
-### Decisions made
-| Decision | Value |
-|----------|-------|
-| Brand name | OHMXO |
-| Founder | Jacob Adeshiyan |
-| Positioning | Digital architecture × music × technology |
-| Domain | ohmxo.com |
-| Tagline | "Digital architecture for artists, brands, and creative enterprises." |
-| OG description | "Digital architecture for music × tech" |
+### Why it works this way
+No major website allows iframing. Google, DuckDuckGo, Bing, GitHub, Apple all send `X-Frame-Options: DENY/SAMEORIGIN` or `frame-ancestors 'none'/'self'`. The only way to show real web pages in IE is via a server-side proxy that strips frame-blocking headers — which requires the full API backend deployed.
 
----
+### To restore full browsing
+Reinstate `/api/iframe-check` with a server-side fetch proxy that:
+1. Fetches the upstream URL
+2. Strips `X-Frame-Options` and `frame-ancestors` from the response
+3. Injects a base tag and navigation interceptor script
+4. Returns the modified HTML to the iframe
 
-## Known Bugs
-
-### iPod — Click Wheel Not Responding on Desktop
-The iPod uses a touch/click-wheel interface (`IpodWheel.tsx`) that requires click-and-drag rotation or touch gestures. On desktop with a mouse/trackpad:
-- **Click-and-drag** on the wheel ring (not the center button) to rotate — this works but may not be obvious
-- **Scroll wheel** on the wheel ring also works
-- If nothing happens, the wheel may not be receiving events properly — the click areas are mapped to 4 sections around the wheel (top=menu, right=skip, bottom=play, left=back)
-
-**Fix needed:** The wheel interaction model is not discoverable. A trackpad two-finger scroll or simple scroll gesture should work. The `handleMouseWheel` handler exists but only fires when the cursor is directly over the wheel div.
-
-### Internet Explorer — Does Not Load Pages
-IE requires the backend API (`/api/iframe-check`) to proxy pages and the AI generation endpoint (`/api/ie-generate`) for time-travel content. Both are dependent on:
-- **API server running** — `bun run dev` starts the full stack, but `bun run dev:vite` (frontend only) means IE has no backend
-- **AI provider key** — time-travel AI generation requires at least one of `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GOOGLE_GENERATIVE_AI_API_KEY`
-- **Redis** — AI generation results are cached in Redis (NoopRedisAdapter returns cache misses, so generation still works but is uncached)
-
-**To test IE:** Run `bun run dev` (full stack), set an AI provider key in `.env.local`, and try loading a modern URL like `https://example.com`. If the page loads in an iframe, IE is working. The time-travel feature (year selector) will only work with an AI key.
-
----
-
-## Items Intentionally Left Untouched
-
-| Category | Reason |
-|----------|--------|
-| App metadata `creator: { name: "Ryo Lu" }` | Original attribution — pending decision on OHMXO ownership vs preserved credits |
-| `ryos:*` localStorage keys | Internal state persistence — changing would break all user state |
-| `[ryOS]` console.log/warn prefixes | Internal debugging — not user-facing |
-| `ryos-*` CSS classes | Styling — would need comprehensive theme rebuild |
-| `data-ryos-*` DOM attributes | Internal markers — not user-facing |
-| `DB_NAME = "ryOS"` in IndexedDB | Internal database name |
-| AI assistant "Ryo" name | Pending OHMXO assistant identity decision |
-| `os.ryo.lu` internal config URLs | Internal only — update when domain migration requires it |
-| Architecture/API documentation | Pending broader docs pass |
-| AGENTS.md | Internal developer documentation |
-| GitHub repo attribution | Correct code origin |
-| All app metadata GitHub links | Correct upstream source — keep as `ryokun6/ryos` |
+This is what the original ryOS code did before simplification.
 
 ---
 
@@ -142,12 +100,12 @@ Reference: `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`
 
 | # | Item | Type | Required For |
 |---|------|------|-------------|
-| 1 | Official OHMXO logo/brand mark (SVG) | Asset | Brand mark in OS, favicon, social cards |
-| 2 | Social links (Twitter/X, LinkedIn, Instagram, GitHub) | Information | Default contacts, bookmarks, footer |
+| 1 | Official OHMXO logo/brand mark (SVG) | Asset | Brand mark, favicon, social cards |
+| 2 | Social links (Twitter/X, LinkedIn, IG, GitHub) | Info | Default contacts, bookmarks |
 | 3 | Founder title/role wording | Decision | About dialog, contact info |
-| 4 | Privacy policy URL / terms of service URL | Decision | Legal footer, About dialog |
-| 5 | Font licensing decision (Humane, Neue Montreal vs alternatives) | Decision | Theme system, UI typography |
-| 6 | Default wallpaper / theme direction | Decision | Boot screen, desktop background |
+| 4 | Privacy policy URL / terms URL | Decision | Legal footer |
+| 5 | Font licensing decision | Decision | Themes, UI typography |
+| 6 | Default wallpaper / theme direction | Decision | Boot screen, desktop |
 | 7 | AI assistant name and personality | Decision | AI chat, assistant overlay |
 
 ---
@@ -157,37 +115,22 @@ Reference: `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`
 | Feature | Status | What's Required |
 |---------|--------|----------------|
 | Chat endpoint `/api/chat` | Wired, blocked | At least one AI provider key |
-| Chats app | `hidden: true` | Remove hidden flag when ready |
-| Assistant overlay | Dead code (not rendered) | Wire into layout and define OHMXO persona |
+| Chats app | `hidden: true` | Remove flag when ready |
+| Assistant overlay | Dead code (not rendered) | Wire into layout, define OHMXO persona |
 | TTS `/api/speech` | Wired, blocked | `ELEVENLABS_API_KEY` or `OPENAI_API_KEY` |
 | STT `/api/audio-transcribe` | Wired, blocked | `OPENAI_API_KEY` |
-| Rate limiting | Disabled (NoopRedisAdapter bypass) | Enable if Redis is configured |
+| Rate limiting | Disabled (NoopRedisAdapter) | Enable if Redis configured |
 | Conversation persistence | Disabled | Requires Redis |
-| IE generation `/api/ie-generate` | Wired, needs key + backend | AI key + API server running |
-| IE iframe proxy `/api/iframe-check` | Wired, needs backend | API server running |
-| Applet AI `/api/applet-ai` | Wired | `GOOGLE_GENERATIVE_AI_API_KEY` |
-
-Key finding: With just one AI provider key (e.g., `ANTHROPIC_API_KEY`), chat works immediately for single-session use. Full functionality (history, persistence) requires Redis. Pusher is optional (graceful fallback).
+| IE generation `/api/ie-generate` | Wired but IE simplified | AI key + Redis |
+| Applet AI | Wired | `GOOGLE_GENERATIVE_AI_API_KEY` |
 
 ---
 
-## Recommended Next Steps
+## Key Documents
 
-### Phase 2 — Brand Asset Integration (blocked on decisions above)
-1. Collect official OHMXO logo files and social links
-2. Confirm font strategy (licenses or alternatives)
-3. Choose default wallpaper / theme direction
-4. Define AI assistant identity
-5. Set privacy/terms policy URLs
-6. Apply collected assets to OS chrome (themes, icons, wallpapers)
-7. Wire AI assistant with OHMXO personality
-
-### Phase 3 — Portfolio Content
-8. Studio app — campaign case studies (Works.csv data)
-9. Chartmetric-style stats widget
-10. Branded voice assistant
-
-### Phase 4 — Deployment
-11. Set AI provider keys in production
-12. Configure domain (ohmxo.com DNS)
-13. Privacy/AGPL disclosure
+- [TASK.md](TASK.md) — Session handoff & current focus
+- [README.md](README.md) — Public-facing overview
+- [CLAUDE.md](CLAUDE.md) — Claude Code project instructions
+- [AGENTS.md](AGENTS.md) — Cloud environment guide
+- [PLAN.md](PLAN.md) — High-level roadmap
+- [ROADMAP.md](ROADMAP.md) — Implementation phases
