@@ -12,7 +12,7 @@ import { EventEmitter } from "node:events";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { createRedis, getRedisBackend } from "../api/_utils/redis.js";
+import { createRedis, getRedisBackendSafe } from "../api/_utils/redis.js";
 import {
   authorizeRealtimeChannel,
   consumeRealtimeTicket,
@@ -808,22 +808,26 @@ async function handleStaticRequest(pathname: string): Promise<Response | null> {
 }
 
 function validateEnv(): void {
-  const redisBackend = getRedisBackend();
+  const redisBackend = getRedisBackendSafe();
   const realtimeProvider = getRealtimeProvider();
 
+  // When no Redis is configured, don't require any Redis env vars —
+  // the NoopRedisAdapter handles this gracefully at runtime.
   const required: { name: string; description: string }[] =
-    redisBackend === "redis-url"
-      ? [{ name: "REDIS_URL", description: "Standard Redis connection URL" }]
-      : [
-          {
-            name: "REDIS_KV_REST_API_URL",
-            description: "Upstash Redis REST API URL",
-          },
-          {
-            name: "REDIS_KV_REST_API_TOKEN",
-            description: "Upstash Redis REST API token",
-          },
-        ];
+    redisBackend === "none"
+      ? []
+      : redisBackend === "redis-url"
+        ? [{ name: "REDIS_URL", description: "Standard Redis connection URL" }]
+        : [
+            {
+              name: "REDIS_KV_REST_API_URL",
+              description: "Upstash Redis REST API URL",
+            },
+            {
+              name: "REDIS_KV_REST_API_TOKEN",
+              description: "Upstash Redis REST API token",
+            },
+          ];
 
   const optional: { name: string; description: string }[] = [
     {
@@ -844,9 +848,13 @@ function validateEnv(): void {
         description: "Pusher app ID (real-time features)",
       },
     );
-  } else if (redisBackend !== "redis-url") {
+  } else if (redisBackend !== "redis-url" && redisBackend !== "none") {
     console.warn(
       "[api-standalone] REALTIME_PROVIDER=local works best with REDIS_URL so websocket broadcasts can fan out across multiple instances. Falling back to in-process delivery only.",
+    );
+  } else if (redisBackend === "none") {
+    console.warn(
+      "[api-standalone] No Redis configured. Redis-dependent features (auth sessions, rate limiting, realtime pub/sub, AI caching) will be disabled. The IE proxy, chat, and static file server still work without Redis.",
     );
   }
 
@@ -867,7 +875,7 @@ function validateEnv(): void {
       `[api-standalone] Required env vars missing:\n` +
         missing.map((v) => `  - ${v.name}: ${v.description}`).join("\n"),
     );
-    process.exit(1);
+    if (redisBackend !== "none") process.exit(1);
   }
 }
 
@@ -920,7 +928,7 @@ async function bootstrap(): Promise<void> {
             runtime: "standalone-bun-serve",
             routeCount: routes.length,
             realtimeProvider: getRealtimeProvider(),
-            redisBackend: getRedisBackend(),
+            redisBackend: getRedisBackendSafe(),
           },
           200,
         );
