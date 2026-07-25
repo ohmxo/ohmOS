@@ -901,6 +901,13 @@ export const useInternetExplorerStore = create<InternetExplorerStore>()(
     {
       name: "ryos:internet-explorer",
       version: CURRENT_IE_STORE_VERSION,
+      migrate: (persisted, version) => {
+        // Version 7: reset defaults to avoid stale state from old versions
+        if (version < 7) {
+          return { ...getInitialState() };
+        }
+        return persisted as InternetExplorerStore;
+      },
       partialize: (state) => ({
         url: state.url,
         year: state.year,
