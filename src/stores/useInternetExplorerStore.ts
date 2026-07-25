@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { useStoreShallow } from "./helpers";
 import { persist } from "zustand/middleware";
-import { abortableFetch } from "@/utils/abortableFetch";
 
 // Define types
 export interface Favorite {
@@ -716,13 +715,13 @@ export const useInternetExplorerStore = create<InternetExplorerStore>()(
           // Fetch cached years after successful navigation if history was added/updated
           if (addedToHistory && targetUrl) {
             // Trigger fetch, but don't block state update
-            get().fetchCachedYears(targetUrl);
+            // Cached years fetch disabled — time-travel proxy not active
           }
           // If no history update occurred (duplicate) and cachedYears is empty, still fetch
           else if (!addedToHistory && targetUrl) {
             const existingCachedYears = get().cachedYears;
             if (!existingCachedYears || existingCachedYears.length === 0) {
-              get().fetchCachedYears(targetUrl);
+              // Cached years fetch disabled — time-travel proxy not active
             }
           }
 
@@ -835,53 +834,11 @@ export const useInternetExplorerStore = create<InternetExplorerStore>()(
 
       setTimeMachineViewOpen: (isOpen) =>
         set({ isTimeMachineViewOpen: isOpen }),
-      fetchCachedYears: async (url) => {
-        if (!url) return;
-        set({ isFetchingCachedYears: true, cachedYears: [] });
-        try {
-          const normalizedUrl = url.startsWith("http") ? url : `https://${url}`;
-          const response = await abortableFetch(
-            `/api/iframe-check?mode=list-cache&url=${encodeURIComponent(
-              normalizedUrl
-            )}`,
-            {
-              timeout: 15000,
-              retry: { maxAttempts: 2, initialDelayMs: 500 },
-            }
-          );
-          const data = await response.json();
-          const fetchedYears: string[] = data.years || [];
-          const currentActualYear = new Date().getFullYear();
-
-          const futureYearsApi = fetchedYears
-            .filter(
-              (year) =>
-                !isNaN(parseInt(year)) && parseInt(year) > currentActualYear
-            )
-            .sort((a, b) => parseInt(b) - parseInt(a));
-
-          const pastYearsApi = fetchedYears
-            .filter(
-              (year) =>
-                !isNaN(parseInt(year)) && parseInt(year) <= currentActualYear
-            )
-            .sort((a, b) => parseInt(b) - parseInt(a));
-
-          const nonNumericPastYears = fetchedYears.filter(
-            (year) => isNaN(parseInt(year)) && year !== "current"
-          );
-
-          const sortedYears = [
-            ...futureYearsApi,
-            "current",
-            ...pastYearsApi,
-            ...nonNumericPastYears,
-          ];
-          set({ cachedYears: sortedYears, isFetchingCachedYears: false });
-        } catch (error) {
-          console.error("Error fetching cached years:", error);
-          set({ isFetchingCachedYears: false, cachedYears: ["current"] });
-        }
+      fetchCachedYears: async (_url) => {
+        // Disabled — time-travel proxy is not active in simplified mode.
+        // Restore the `/api/iframe-check?mode=list-cache&url=` call if
+        // time-travel functionality is re-enabled in the future.
+        set({ isFetchingCachedYears: false, cachedYears: [] });
       },
 
       // Add implementations for new actions
