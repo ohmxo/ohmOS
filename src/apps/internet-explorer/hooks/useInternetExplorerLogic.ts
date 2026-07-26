@@ -1,67 +1,29 @@
-import React, {
+import {
   useEffect,
   useRef,
   useReducer,
   useState,
   useCallback,
-  useMemo,
   CSSProperties,
-  ReactNode,
 } from "react";
-import { InternetExplorerInitialData } from "../../base/types";
-import {
-  useInternetExplorerStore,
-  DEFAULT_FAVORITES,
-  Favorite,
-  isDirectPassthrough,
-} from "@/stores/useInternetExplorerStore";
-import { useAiGeneration } from "./useAiGeneration";
-import { useTerminalSounds } from "@/hooks/useTerminalSounds";
+import type { InternetExplorerInitialData } from "../../base/types";
+import { DEFAULT_FAVORITES } from "@/stores/useInternetExplorerStore";
+import type { Favorite } from "@/stores/useInternetExplorerStore";
 import { useAppStore } from "@/stores/useAppStore";
-import { useDisplaySettingsStore } from "@/stores/useDisplaySettingsStore";
-import { useAudioSettingsStore } from "@/stores/useAudioSettingsStore";
 import { useThemeFlags } from "@/hooks/useThemeFlags";
-import { IE_ANALYTICS, normalizeUrlForAnalytics, track } from "@/utils/analytics";
 import { useOffline } from "@/hooks/useOffline";
-import { checkOfflineAndShowError } from "@/utils/offline";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useTranslatedHelpItems } from "@/hooks/useTranslatedHelpItems";
 import { useAppHelpAboutDialogs } from "@/hooks/useAppHelpAboutDialogs";
 import { useInternetExplorerStoreShallow } from "@/stores/useInternetExplorerStore";
-import { abortableFetch } from "@/utils/abortableFetch";
-import { internetExplorerLog as log } from "../logging";
 import { onAppUpdate } from "@/utils/appEventBus";
-import { decodeHtmlEntities } from "@/utils/decodeHtmlEntities";
+import { formatTitle, decodeData } from "../utils/urlHelpers";
 import {
-  getLanguageDisplayName,
-  getLocationDisplayName,
-} from "../utils/displayNames";
-import {
-  IE_IFRAME_NAVIGATION_TIMEOUT_MS,
-  readIframeProxyError,
-} from "../utils/iframeProxyError";
-import {
-  getHostnameFromUrl,
-  formatTitle,
-  decodeData,
-  normalizeUrlForHistory,
-} from "../utils/urlHelpers";
-import {
-  SuggestionItem,
+  type SuggestionItem,
   urlBarUiReducer,
   urlBarUiInitialState,
 } from "../utils/urlBarUiReducer";
-import {
-  getPastYears,
-  getFutureYears,
-} from "../components/ie-menu-bar/yearLists";
-
-
-// Debug helper to identify direct passthrough URLs
-const logDirectPassthrough = (url: string) => {
-  log.debug("Direct passthrough mode", { url });
-};
 
 interface UseInternetExplorerLogicProps {
   isWindowOpen: boolean;
@@ -73,15 +35,10 @@ interface UseInternetExplorerLogicProps {
 
 export function useInternetExplorerLogic({
   isWindowOpen,
-  isForeground,
   initialData,
   instanceId,
   helpItems,
 }: UseInternetExplorerLogicProps) {
-  const debugMode = useDisplaySettingsStore((state) => state.debugMode);
-  const terminalSoundsEnabled = useAudioSettingsStore(
-    (state) => state.terminalSoundsEnabled
-  );
   const bringInstanceToForeground = useAppStore(
     (state) => state.bringInstanceToForeground
   );
@@ -91,38 +48,17 @@ export function useInternetExplorerLogic({
 
   const {
     url,
-    year,
-    mode,
-    token,
     favorites,
     history,
     historyIndex,
     isTitleDialogOpen,
     newFavoriteTitle,
-    isNavigatingHistory,
     isClearFavoritesDialogOpen,
     isClearHistoryDialogOpen,
     currentPageTitle,
-    timelineSettings,
-    status,
-    finalUrl,
-    aiGeneratedHtml,
-    errorDetails,
-    isResetFavoritesDialogOpen,
-    isFutureSettingsDialogOpen,
-    language,
-    location,
-    isTimeMachineViewOpen,
-    cachedYears,
-    isFetchingCachedYears,
+    errorMessage,
 
     setUrl,
-    setYear,
-    navigateStart,
-    setFinalUrl,
-    loadSuccess,
-    loadError,
-    cancel,
     addFavorite,
     clearFavorites,
     setHistoryIndex,
@@ -132,54 +68,23 @@ export function useInternetExplorerLogic({
     setNavigatingHistory,
     setClearFavoritesDialogOpen,
     setClearHistoryDialogOpen,
-    handleNavigationError,
-    setPrefetchedTitle,
-    clearErrorDetails,
-    setResetFavoritesDialogOpen,
-    setFutureSettingsDialogOpen,
-    setLanguage,
-    setLocation,
-    setTimeMachineViewOpen,
-    debugProxySessions,
-    debugForceHeadless,
-    debugVerboseLogging,
-    setDebugProxySessions,
-    setDebugForceHeadless,
-    setDebugVerboseLogging,
+    setCurrentPageTitle,
+    setErrorMessage,
+    navigateToUrl,
   } = useInternetExplorerStoreShallow((state) => ({
     url: state.url,
-    year: state.year,
-    mode: state.mode,
-    token: state.token,
     favorites: state.favorites,
     history: state.history,
     historyIndex: state.historyIndex,
     isTitleDialogOpen: state.isTitleDialogOpen,
     newFavoriteTitle: state.newFavoriteTitle,
-    isNavigatingHistory: state.isNavigatingHistory,
     isClearFavoritesDialogOpen: state.isClearFavoritesDialogOpen,
     isClearHistoryDialogOpen: state.isClearHistoryDialogOpen,
     currentPageTitle: state.currentPageTitle,
-    timelineSettings: state.timelineSettings,
-    status: state.status,
-    finalUrl: state.finalUrl,
-    aiGeneratedHtml: state.aiGeneratedHtml,
-    errorDetails: state.errorDetails,
-    isResetFavoritesDialogOpen: state.isResetFavoritesDialogOpen,
-    isFutureSettingsDialogOpen: state.isFutureSettingsDialogOpen,
-    language: state.language,
-    location: state.location,
-    isTimeMachineViewOpen: state.isTimeMachineViewOpen,
-    cachedYears: state.cachedYears,
-    isFetchingCachedYears: state.isFetchingCachedYears,
+    errorMessage: state.errorMessage,
+    isNavigatingHistory: state.isNavigatingHistory,
 
     setUrl: state.setUrl,
-    setYear: state.setYear,
-    navigateStart: state.navigateStart,
-    setFinalUrl: state.setFinalUrl,
-    loadSuccess: state.loadSuccess,
-    loadError: state.loadError,
-    cancel: state.cancel,
     addFavorite: state.addFavorite,
     clearFavorites: state.clearFavorites,
     setHistoryIndex: state.setHistoryIndex,
@@ -189,20 +94,9 @@ export function useInternetExplorerLogic({
     setNavigatingHistory: state.setNavigatingHistory,
     setClearFavoritesDialogOpen: state.setClearFavoritesDialogOpen,
     setClearHistoryDialogOpen: state.setClearHistoryDialogOpen,
-    handleNavigationError: state.handleNavigationError,
-    setPrefetchedTitle: state.setPrefetchedTitle,
-    clearErrorDetails: state.clearErrorDetails,
-    setResetFavoritesDialogOpen: state.setResetFavoritesDialogOpen,
-    setFutureSettingsDialogOpen: state.setFutureSettingsDialogOpen,
-    setLanguage: state.setLanguage,
-    setLocation: state.setLocation,
-    setTimeMachineViewOpen: state.setTimeMachineViewOpen,
-    debugProxySessions: state.debugProxySessions,
-    debugForceHeadless: state.debugForceHeadless,
-    debugVerboseLogging: state.debugVerboseLogging,
-    setDebugProxySessions: state.setDebugProxySessions,
-    setDebugForceHeadless: state.setDebugForceHeadless,
-    setDebugVerboseLogging: state.setDebugVerboseLogging,
+    setCurrentPageTitle: state.setCurrentPageTitle,
+    setErrorMessage: state.setErrorMessage,
+    navigateToUrl: state.navigateToUrl,
   }));
 
   const { t } = useTranslation();
@@ -217,11 +111,6 @@ export function useInternetExplorerLogic({
     helpItems ?? []
   );
   const appName = t("apps.internet-explorer.appName");
-
-  // The IE Debug menu is only available when global debug mode is on. The
-  // advanced proxy toggles below opt into env-gated proxy features
-  // (cookie/session passthrough, forced headless) per browser.
-  const showDebugMenu = debugMode;
 
   const getSharedPageToastDescription = useCallback(
     (sharedPage: { url: string; year?: string }) =>
@@ -240,41 +129,10 @@ export function useInternetExplorerLogic({
     });
   }, [t]);
 
-  const getLoadingTitle = useCallback(
-    (baseTitle: string): string => {
-      // If it looks like a URL, extract the hostname
-      const titleToUse =
-        baseTitle.includes("/") || baseTitle.includes(".")
-          ? getHostnameFromUrl(baseTitle)
-          : baseTitle;
-
-      const formattedTitle = formatTitle(titleToUse);
-      return formattedTitle === "Internet Explorer"
-        ? t("apps.internet-explorer.loadingTitle")
-        : t("apps.internet-explorer.loadingTitleWithSite", {
-            site: formattedTitle,
-          });
-    },
-    [t]
-  );
-
-  const abortControllerRef = useRef<AbortController | null>(null);
-  /** Clears a hung iframe navigation so the desktop stays responsive. */
-  const iframeLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
-  const clearIframeLoadTimeout = useCallback(() => {
-    if (iframeLoadTimeoutRef.current !== null) {
-      clearTimeout(iframeLoadTimeoutRef.current);
-      iframeLoadTimeoutRef.current = null;
-    }
-  }, []);
   const [hasMoreToScroll] = useState(false);
   const [urlBarUiState, dispatchUrlBarUi] = useReducer(
     urlBarUiReducer,
     urlBarUiInitialState,
-    // Initialize the address bar from the store's persisted url so no
-    // post-mount sync effect is needed.
     (initialState) => ({
       ...initialState,
       localUrl: url.replace(/^(https?:\/\/|ftp:\/\/)/i, ""),
@@ -287,6 +145,13 @@ export function useInternetExplorerLogic({
     isSelectingText,
     selectedSuggestionIndex,
     dropdownStyle,
+  }: {
+    isUrlDropdownOpen: boolean;
+    filteredSuggestions: SuggestionItem[];
+    localUrl: string;
+    isSelectingText: boolean;
+    selectedSuggestionIndex: number;
+    dropdownStyle: CSSProperties;
   } = urlBarUiState;
   const setIsUrlDropdownOpen = useCallback((value: boolean) => {
     dispatchUrlBarUi({ type: "setIsUrlDropdownOpen", value });
@@ -310,89 +175,40 @@ export function useInternetExplorerLogic({
     []
   );
 
-  useEffect(() => {
-    const updateDropdownStyle = () => {
-      if (isUrlDropdownOpen && urlInputRef.current) {
-        const isMobileView = window.innerWidth < 640; // Tailwind 'sm' breakpoint (640px)
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const favoritesContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-        if (isMobileView) {
-          const inputRect = urlInputRef.current.getBoundingClientRect();
-          const newTop = `${inputRect.bottom}px`;
-          setDropdownStyle((prev) => {
-            // Only update if values actually changed to prevent re-renders
-            if (prev.top === newTop && prev.position === "fixed") {
-              return prev;
-            }
-            return {
-              position: "fixed",
-              top: newTop,
-              left: "1rem",
-              right: "1rem",
-              zIndex: 50,
-            };
-          });
-        } else {
-          // Not mobile, clear style if set
-          setDropdownStyle((prev) => (Object.keys(prev).length > 0 ? {} : prev));
-        }
-      } else {
-        // Dropdown not open, clear style if set
-        setDropdownStyle((prev) => (Object.keys(prev).length > 0 ? {} : prev));
-      }
-    };
+  const { currentTheme, isWindowsTheme } = useThemeFlags();
 
-    updateDropdownStyle();
-    window.addEventListener("resize", updateDropdownStyle);
+  const [finalUrl, setFinalUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [displayTitle, setDisplayTitle] = useState<string>(appName);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
-    return () => {
-      window.removeEventListener("resize", updateDropdownStyle);
-    };
-  }, [isUrlDropdownOpen]);
-
-  // Utility to normalize URLs for comparison
-  const normalizeUrlInline = (url: string): string => {
-    if (!url) return "";
-    let normalized = url.trim().toLowerCase();
-    normalized = normalized.replace(/^(https?:\/\/|ftp:\/\/)/i, "");
-    normalized = normalized.replace(/\/$/g, "");
-    normalized = normalized.replace(/^www\./i, "");
-    return normalized;
-  };
-
-  // Strip protocol prefixes for display - memoized to prevent dependency issues
-  const stripProtocol = useCallback((url: string): string => {
-    if (!url) return "";
-    return url.replace(/^(https?:\/\/|ftp:\/\/)/i, "");
+  const stripProtocol = useCallback((u: string): string => {
+    if (!u) return "";
+    return u.replace(/^(https?:\/\/|ftp:\/\/)/i, "");
   }, []);
 
-  // Sync localUrl when the store's url changes (navigation, history, share
-  // links, post-load normalization). Derived during render instead of via an
-  // effect so user typing is only reset when the url actually changed since
-  // the last render, never by unrelated re-renders.
-  const [prevStoreUrl, setPrevStoreUrl] = useState(url);
-  if (prevStoreUrl !== url) {
-    setPrevStoreUrl(url);
-    setLocalUrl(stripProtocol(url));
-  }
+  const normalizeUrlInline = useCallback((u: string): string => {
+    if (!u) return "";
+    let n = u.trim().toLowerCase();
+    n = n.replace(/^(https?:\/\/|ftp:\/\/)/i, "");
+    n = n.replace(/\/$/g, "");
+    n = n.replace(/^www\./i, "");
+    return n;
+  }, []);
 
-  // Helper to validate if a URL is well-formed enough to be saved
   const isValidUrl = useCallback(
     (urlString: string): boolean => {
-      // Fairly permissive validation - checks for at least a domain-like structure
       if (!urlString || !urlString.trim()) return false;
-
-      // We shouldn't have protocols at this point, but just in case
       const trimmed = stripProtocol(urlString.trim());
-
-      // Check for at least something that looks like a domain
-      // Accept: domain.tld, domain, localhost, IP addresses
-      // Make sure it doesn't start with "bing:" which is our internal marker
       if (trimmed.startsWith("bing:")) return false;
-
       return (
-        /^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?/i.test(
-          trimmed
-        ) ||
+        /^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?/i.test(trimmed) ||
         /^localhost(:[0-9]+)?$/i.test(trimmed) ||
         /^(\d{1,3}\.){3}\d{1,3}(:[0-9]+)?$/i.test(trimmed)
       );
@@ -400,825 +216,102 @@ export function useInternetExplorerLogic({
     [stripProtocol]
   );
 
-  const urlInputRef = useRef<HTMLInputElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const favoritesContainerRef = useRef<HTMLDivElement>(null);
-
-  const {
-    aiGeneratedHtml: generatedHtml,
-    isAiLoading,
-    isFetchingWebsiteContent,
-    stopGeneration,
-  } = useAiGeneration({
-    onLoadingChange: () => {},
-    customTimeline: timelineSettings,
-  });
-
-  const { playElevatorMusic, stopElevatorMusic, playDingSound } =
-    useTerminalSounds();
-
-  const { currentTheme, isWindowsTheme } = useThemeFlags();
-
-  const currentYear = new Date().getFullYear();
-  // Single source of truth for the year dropdowns, shared with the menu bar
-  // (see `ie-menu-bar/yearLists.ts`). Previously the toolbar duplicated a
-  // smaller future-year list (2150+ only), which caused menu-selected years
-  // like 2030–2090 to classify as `future` mode yet still render the iframe
-  // branch — navigation appeared to do nothing. Using the canonical lists
-  // keeps the toolbar, menu bar, and `mode` classification consistent.
-  const pastYears = useMemo(() => getPastYears(currentYear), [currentYear]);
-  const futureYears = useMemo(
-    () => getFutureYears(currentYear),
-    [currentYear]
-  );
-
-  // A page renders as an AI-generated reconstruction whenever the active
-  // navigation mode is "future" (any year beyond the current one), regardless
-  // of whether that specific year is in the dropdown. Deriving this from the
-  // store's `mode` — rather than membership in a hardcoded list — ensures the
-  // content pane reliably shows the AI view for every future year.
-  const isFutureYear = mode === "future";
-
-  // Define loading state early to prevent hoisting issues
-  const isLoading =
-    status === "loading" || isAiLoading || isFetchingWebsiteContent;
-
-  // Define animation variants for loading bar
-  const loadingBarVariants = {
-    hidden: { height: 0 },
-    visible: { height: 4 },
-  };
-
-  // Generate share URL function (base64 encoded for clean URLs and OG tags)
-  const ieGenerateShareUrl = useCallback(
-    (identifier: string, secondaryIdentifier?: string) => {
-      const combined = `${identifier}|${secondaryIdentifier || "current"}`;
-      const code = btoa(combined)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-      return `${window.location.origin}/internet-explorer/${code}`;
-    },
-    []
-  );
-
-  const [displayTitle, setDisplayTitle] = useState<string>(appName);
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [prevStoreUrl, setPrevStoreUrl] = useState(url);
+  if (prevStoreUrl !== url) {
+    setPrevStoreUrl(url);
+    setLocalUrl(stripProtocol(url));
+  }
 
   useEffect(() => {
     let newTitle = appName;
-    const baseTitle = currentPageTitle || url;
-    const isTimeTravelling = status === "loading" && year !== "current";
-
-    if (isTimeTravelling) {
-      const titleToUse =
-        baseTitle.includes("/") || baseTitle.includes(".")
-          ? getHostnameFromUrl(baseTitle)
-          : baseTitle;
-      const formattedTitle = formatTitle(titleToUse);
-      newTitle =
-        formattedTitle === "Internet Explorer"
-          ? t("apps.internet-explorer.travellingTitle")
-          : t("apps.internet-explorer.travellingTitleWithSite", {
-              site: formattedTitle,
-            });
-    } else if (status === "loading") {
-      newTitle = getLoadingTitle(baseTitle);
-    } else if (currentPageTitle) {
+    if (currentPageTitle) {
       newTitle = formatTitle(currentPageTitle);
-    } else if (finalUrl) {
+    } else if (url) {
       try {
-        const urlToParse =
-          finalUrl.startsWith("http") || finalUrl.startsWith("/")
-            ? finalUrl
-            : `https://${finalUrl}`;
-        const effectiveUrl = urlToParse.startsWith("/api/iframe-check")
-          ? url
-          : urlToParse;
-        const hostname = new URL(
-          effectiveUrl.startsWith("http")
-            ? effectiveUrl
-            : `https://${effectiveUrl}`
-        ).hostname;
-        newTitle = formatTitle(hostname);
+        newTitle = formatTitle(
+          new URL(url.startsWith("http") ? url : `https://${url}`).hostname
+        );
       } catch {
-        try {
-          const fallbackHostname = getHostnameFromUrl(url);
-          newTitle = formatTitle(fallbackHostname);
-        } catch {
-          log.debug("Failed to parse URL for title", {
-            hasFinalUrl: Boolean(finalUrl),
-            hasUrl: Boolean(url),
-          });
-          newTitle = appName;
-        }
+        newTitle = appName;
       }
     }
-
     setDisplayTitle(newTitle);
-  }, [status, currentPageTitle, finalUrl, url, year, t, getLoadingTitle, appName]);
+  }, [currentPageTitle, url, appName]);
 
-  // Ref to keep the most recent navigation token in sync without waiting for a render
-  const navTokenRef = useRef<number>(0);
-
-  const handleIframeLoad = async () => {
-    if (
-      iframeRef.current &&
-      iframeRef.current.dataset.navToken === navTokenRef.current.toString()
-    ) {
-      clearIframeLoadTimeout();
-      const iframeSrc = iframeRef.current.src;
-      if (
-        iframeSrc.includes("/api/iframe-check") &&
-        iframeRef.current.contentDocument
-      ) {
-        try {
-          const potentialErrorData = readIframeProxyError(
-            iframeRef.current.contentDocument
-          );
-          if (potentialErrorData) {
-            log.debug("Detected JSON error response in iframe", {
-              type: potentialErrorData.type,
-              status: potentialErrorData.status,
-            });
-            track(IE_ANALYTICS.NAVIGATION_ERROR, {
-              ...normalizeUrlForAnalytics(iframeSrc),
-              type: potentialErrorData.type,
-              status: potentialErrorData.status || 500,
-            });
-            handleNavigationError(potentialErrorData, url);
-            return;
-          }
-        } catch (error) {
-          console.warn("[IE] Error processing iframe content:", error);
-        }
-      }
-
-      clearErrorDetails();
-
-      setTimeout(() => {
-        if (
-          iframeRef.current &&
-          iframeRef.current.dataset.navToken === navTokenRef.current.toString()
-        ) {
-          let loadedTitle: string | null = null;
-          const currentUrlForFallback = url;
-          const fallbackTitle = currentUrlForFallback
-            ? new URL(
-                currentUrlForFallback.startsWith("http")
-                  ? currentUrlForFallback
-                  : `https://${currentUrlForFallback}`
-              ).hostname
-            : "Internet Explorer";
-
-          try {
-            loadedTitle = iframeRef.current?.contentDocument?.title || null;
-            if (loadedTitle) {
-              loadedTitle = decodeHtmlEntities(loadedTitle).trim();
-            }
-          } catch (error) {
-            console.warn(
-              "[IE] Failed to read iframe document title directly:",
-              error
-            );
-          }
-
-          if (!loadedTitle && finalUrl?.startsWith("/api/iframe-check")) {
-            try {
-              const metaTitle = iframeRef.current?.contentDocument
-                ?.querySelector('meta[name="page-title"]')
-                ?.getAttribute("content");
-              if (metaTitle) {
-                loadedTitle = decodeURIComponent(metaTitle);
-              }
-            } catch (error) {
-              console.warn("[IE] Failed to read page-title meta tag:", error);
-            }
-          }
-
-          const favicon = `https://www.google.com/s2/favicons?domain=${
-            new URL(
-              currentUrlForFallback.startsWith("http")
-                ? currentUrlForFallback
-                : `https://${currentUrlForFallback}`
-            ).hostname
-          }&sz=32`;
-
-          track(IE_ANALYTICS.NAVIGATION_SUCCESS, {
-            ...normalizeUrlForAnalytics(currentUrlForFallback),
-            year: year,
-            mode: mode,
-            hasTitle: Boolean(loadedTitle || fallbackTitle),
-          });
-
-          loadSuccess({
-            title: loadedTitle || fallbackTitle,
-            targetUrl: currentUrlForFallback,
-            targetYear: year,
-            favicon: favicon,
-            addToHistory: !isNavigatingHistory,
-          });
-        }
-      }, 50);
-    }
-  };
-
-  const handleIframeError = () => {
-    if (
-      iframeRef.current &&
-      iframeRef.current.dataset.navToken === navTokenRef.current.toString()
-    ) {
-      clearIframeLoadTimeout();
-      setTimeout(() => {
-        if (
-          iframeRef.current &&
-          iframeRef.current.dataset.navToken === navTokenRef.current.toString()
-        ) {
-          try {
-            const targetUrlForError = finalUrl || url;
-            track(IE_ANALYTICS.NAVIGATION_ERROR, {
-              ...normalizeUrlForAnalytics(targetUrlForError),
-              type: "connection_error",
-              status: 404,
-            });
-            handleNavigationError(
-              {
-                error: true,
-                type: "connection_error",
-                status: 404,
-                message: t("apps.internet-explorer.cannotAccessWebsite", {
-                  url: targetUrlForError,
-                }),
-                details: t(
-                  "apps.internet-explorer.pageCouldNotBeLoadedInIframe"
-                ),
-              },
-              targetUrlForError
-            );
-          } catch {
-            const errorMsg = t("apps.internet-explorer.cannotAccessWebsite", {
-              url: finalUrl || url,
-            });
-            track(IE_ANALYTICS.NAVIGATION_ERROR, {
-              ...normalizeUrlForAnalytics(finalUrl || url),
-              type: "generic_error",
-              errorType: "generic_error",
-            });
-            loadError(errorMsg, {
-              error: true,
-              type: "generic_error",
-              message: errorMsg,
-            });
-          }
-        }
-      }, 50);
-    }
-  };
-
+  // --- Navigation ---
   const handleNavigate = useCallback(
-    async (
-      targetUrlParam: string = localUrl || url,
-      targetYearParam: string = year,
-      _forceRegenerate = false,
-      _currentHtmlContent: string | null = null
-    ) => {
-      // Check if offline and show error
-      if (
-        checkOfflineAndShowError(
-          t("apps.internet-explorer.requiresInternetConnection")
-        )
-      ) {
-        return;
-      }
+    (targetUrl: string = localUrl || url) => {
+      if (!targetUrl.trim()) return;
 
-      clearErrorDetails();
-      clearIframeLoadTimeout();
+      setErrorDetails(null);
+      if (abortControllerRef.current) abortControllerRef.current.abort();
 
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-
-      if (isAiLoading) {
-        stopGeneration();
-      }
-      if (iframeRef.current && status === "loading") {
-        iframeRef.current.src = "about:blank";
-      }
-
-      const newMode =
-        targetYearParam === "current"
-          ? "now"
-          : parseInt(targetYearParam) > new Date().getFullYear()
-          ? "future"
-          : "past";
-      const newToken = Date.now();
-
-      // --- Trim the URL from input before navigating ---
-      // Use targetUrlParam directly as it's passed in, or trim the current store url if not passed
-      const urlToNavigate = (
-        targetUrlParam === url ? url.trim() : targetUrlParam
-      ).trim();
-      // Update store immediately so the input reflects the trimmed URL during loading
-      setUrl(urlToNavigate);
-      // --- End Trim ---
-
-      // Store the latest token immediately so that asynchronous iframe load/error
-      // handlers fired before the next React render can still validate correctly.
-      navTokenRef.current = newToken;
-
-      track(IE_ANALYTICS.NAVIGATION_START, {
-        ...normalizeUrlForAnalytics(urlToNavigate),
-        year: targetYearParam,
-        mode: newMode,
-      });
-
-      navigateStart(urlToNavigate, targetYearParam, newMode, newToken);
-
-      if (debugVerboseLogging) {
-        log.info("[debug] navigate", {
-          url: urlToNavigate,
-          year: targetYearParam,
-          mode: newMode,
-          headless: debugForceHeadless,
-          sessions: debugProxySessions,
-        });
-      }
-
-      const normalizedTargetUrl = urlToNavigate.startsWith("http")
-        ? urlToNavigate
-        : `https://${urlToNavigate}`;
-
-      try {
-        if (
-          newMode === "future" ||
-          (newMode === "past" && parseInt(targetYearParam) <= 1995)
-        ) {
-          // Time-travel / AI generation mode — show a placeholder message
-          // until an AI provider key is configured on the server.
-          const placeholderHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Time Travel — Not Configured</title><style>body{font-family:-apple-system,system-ui,sans-serif;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:2rem;text-align:center}p{max-width:400px;line-height:1.6;color:#aaa;font-size:14px}h1{font-size:20px;margin-bottom:0.5rem;color:#fff}code{background:#333;padding:2px 6px;border-radius:3px;font-size:13px}</style></head><body><div><h1>🌌 Time Travel Not Available</h1><p>AI-powered time-travel browsing requires an AI provider key configured on the server. Set <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or <code>GOOGLE_GENERATIVE_AI_API_KEY</code> in your environment to enable this feature.</p></div></body></html>`;
-
-          navigateStart(normalizedTargetUrl, targetYearParam, newMode, Date.now());
-          loadSuccess({
-            aiGeneratedHtml: placeholderHtml,
-            title: `Time Travel — ${normalizedTargetUrl}`,
-            targetUrl: normalizedTargetUrl,
-            targetYear: targetYearParam,
-            favicon: `https://www.google.com/s2/favicons?domain=${new URL(normalizedTargetUrl).hostname}&sz=32`,
-            addToHistory: true,
-          });
+      const urlToNavigate = targetUrl.trim();
+      let normalizedUrl = urlToNavigate;
+      if (!urlToNavigate.startsWith("http://") && !urlToNavigate.startsWith("https://")) {
+        if (isValidUrl(urlToNavigate) || urlToNavigate.includes(".")) {
+          normalizedUrl = `https://${urlToNavigate}`;
         } else {
-          // "now" or "past (1996+)" mode — load directly in the iframe
-          let urlToLoad = normalizedTargetUrl;
-
-          if (newMode === "now") {
-            if (isDirectPassthrough(normalizedTargetUrl)) {
-              // Passthrough domain — load directly in iframe (these allow iframing)
-              logDirectPassthrough(normalizedTargetUrl);
-              urlToLoad = normalizedTargetUrl;
-
-              // Try to fetch the page title (best-effort, non-blocking)
-              try {
-                const checkRes = await abortableFetch(
-                  `/api/iframe-check?mode=check&url=${encodeURIComponent(
-                    normalizedTargetUrl
-                  )}&theme=${encodeURIComponent(currentTheme)}`,
-                  {
-                    signal: abortController.signal,
-                    timeout: 15000,
-                    retry: { maxAttempts: 1, initialDelayMs: 250 },
-                  }
-                );
-                if (abortController.signal.aborted) return;
-
-                const checkData = await checkRes.json();
-                if (checkData.title) {
-                  setPrefetchedTitle(checkData.title);
-                }
-              } catch (error) {
-                if (error instanceof Error && error.name === "AbortError")
-                  return;
-                // Non-fatal — title fetch is best-effort
-              }
-            } else {
-              // Non-passthrough domain — route through the backend proxy which
-              // strips X-Frame-Options and frame-ancestors headers so the page
-              // loads in the iframe. The proxy also injects a navigation
-              // interceptor and handles sub-resource forwarding.
-              urlToLoad = `/api/iframe-check?mode=proxy&url=${encodeURIComponent(normalizedTargetUrl)}&theme=${encodeURIComponent(currentTheme)}`;
-            }
-          } else {
-            // "past" mode (1996+) — route through the Wayback Machine proxy
-            const targetMonth = String(new Date().getMonth() + 1).padStart(2, "0");
-            urlToLoad = `/api/iframe-check?mode=proxy&url=${encodeURIComponent(normalizedTargetUrl)}&year=${encodeURIComponent(targetYearParam)}&month=${encodeURIComponent(targetMonth)}&theme=${encodeURIComponent(currentTheme)}`;
-          }
-
-          if (urlToLoad === finalUrl) {
-            urlToLoad = `${urlToLoad}${
-              urlToLoad.includes("?") ? "&" : "?"
-            }_t=${Date.now()}`;
-          }
-
-          setFinalUrl(urlToLoad);
-
-          if (iframeRef.current) {
-            iframeRef.current.dataset.navToken = newToken.toString();
-            iframeRef.current.src = urlToLoad;
-            // Arm a navigation timeout so a hung proxy/page cannot leave the
-            // desktop stuck in "loading" (or freeze the tab forever).
-            clearIframeLoadTimeout();
-            const timeoutToken = newToken;
-            const timeoutTargetUrl = normalizedTargetUrl;
-            iframeLoadTimeoutRef.current = setTimeout(() => {
-              iframeLoadTimeoutRef.current = null;
-              if (navTokenRef.current !== timeoutToken) return;
-              if (iframeRef.current) {
-                iframeRef.current.src = "about:blank";
-              }
-              track(IE_ANALYTICS.NAVIGATION_ERROR, {
-                ...normalizeUrlForAnalytics(timeoutTargetUrl),
-                type: "timeout",
-                status: 408,
-              });
-              handleNavigationError(
-                {
-                  error: true,
-                  type: "timeout",
-                  status: 408,
-                  message: t("apps.internet-explorer.pageLoadTimedOut"),
-                  details: t(
-                    "apps.internet-explorer.tryRefreshingThePage"
-                  ),
-                },
-                timeoutTargetUrl
-              );
-            }, IE_IFRAME_NAVIGATION_TIMEOUT_MS);
-          }
-        }
-      } catch (error) {
-        clearIframeLoadTimeout();
-        if (!abortController.signal.aborted) {
-          console.error(`[IE] Navigation error:`, error);
-          handleNavigationError(
-            {
-              error: true,
-              type: "navigation_error",
-              message: `Failed to navigate: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
-              details: error instanceof Error ? error.stack : undefined,
-            },
-            normalizedTargetUrl
-          );
+          normalizedUrl = `https://duckduckgo.com/?q=${encodeURIComponent(urlToNavigate)}`;
         }
       }
+
+      const proxyUrl = `/api/iframe-check?mode=proxy&url=${encodeURIComponent(normalizedUrl)}&theme=${encodeURIComponent(currentTheme)}`;
+      setFinalUrl(proxyUrl);
+      setStatus("loading");
+      setUrl(normalizedUrl);
+      navigateToUrl(normalizedUrl);
     },
-    [
-      url,
-      year,
-      finalUrl,
-      status,
-      isAiLoading,
-      navigateStart,
-      setFinalUrl,
-      stopGeneration,
-      loadSuccess,
-      clearErrorDetails,
-      clearIframeLoadTimeout,
-      handleNavigationError,
-      setPrefetchedTitle,
-      setUrl,
-      currentTheme,
-      localUrl,
-      debugVerboseLogging,
-      debugForceHeadless,
-      debugProxySessions,
-      t,
-    ]
+    [url, localUrl, isValidUrl, currentTheme, navigateToUrl, setUrl]
   );
 
   const handleNavigateWithHistory = useCallback(
-    async (targetUrl: string, targetYear?: string) => {
+    (targetUrl: string) => {
       setNavigatingHistory(false);
       setIsUrlDropdownOpen(false);
-      handleNavigate(targetUrl, targetYear || year, false);
+      handleNavigate(targetUrl);
     },
-    [handleNavigate, setNavigatingHistory, year]
+    [handleNavigate, setNavigatingHistory]
   );
 
-  const handleFilterSuggestions = useCallback(
-    (inputValue: string) => {
-      if (!inputValue.trim()) {
-        // When URL bar is empty, show top 3 favorites
-        const topFavorites: Array<SuggestionItem> = [];
+  const handleRefresh = useCallback(() => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    handleNavigate(url);
+  }, [handleNavigate, url]);
 
-        // First check for regular favorites (non-folders)
-        favorites.forEach((fav) => {
-          if (!fav.children && fav.url) {
-            topFavorites.push({
-              title: fav.title || "",
-              url: fav.url,
-              type: "favorite" as const,
-              year: fav.year,
-              favicon: fav.favicon,
-            });
-          }
-        });
+  const handleStop = useCallback(() => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    if (iframeRef.current) iframeRef.current.src = "about:blank";
+    setStatus("idle");
+  }, []);
 
-        // If we still have space, add favorites from folders
-        if (topFavorites.length) {
-          favorites.forEach((fav) => {
-            if (fav.children && fav.children.length > 0) {
-              fav.children.forEach((child) => {
-                if (child.url) {
-                  topFavorites.push({
-                    title: child.title || "",
-                    url: child.url,
-                    type: "favorite" as const,
-                    year: child.year,
-                    favicon: child.favicon,
-                  });
-                }
-              });
-            }
-          });
-        }
-
-        setFilteredSuggestions(topFavorites);
-        setSelectedSuggestionIndex(topFavorites.length > 0 ? 0 : -1);
-        return;
-      }
-
-      const normalizedInput = inputValue.toLowerCase();
-
-      // Utility to normalize URLs inline for comparison
-      const normalizeUrlInline = (url: string): string => {
-        if (!url) return "";
-        let normalized = url.trim().toLowerCase();
-        normalized = normalized.replace(/^(https?:\/\/|ftp:\/\/)/i, "");
-        normalized = normalized.replace(/\/$/g, "");
-        normalized = normalized.replace(/^www\./i, "");
-        return normalized;
-      };
-
-      // Function to process a single favorite
-      const processFavorite = (fav: Favorite) => {
-        // Match by title or URL
-        if (
-          fav.title?.toLowerCase().includes(normalizedInput) ||
-          fav.url?.toLowerCase().includes(normalizedInput)
-        ) {
-          return {
-            title: fav.title || "",
-            url: fav.url || "",
-            type: "favorite" as const,
-            year: fav.year,
-            favicon: fav.favicon,
-            normalizedUrl: normalizeUrlInline(fav.url || ""),
-          };
-        }
-        return null;
-      };
-
-      // Array to collect all matched favorites
-      const allFavoriteSuggestions: Array<SuggestionItem> = [];
-
-      // Process all favorites, including those in folders
-      favorites.forEach((fav) => {
-        if (fav.children) {
-          // If it's a folder, process each child
-          fav.children.forEach((child) => {
-            const match = processFavorite(child);
-            if (match) allFavoriteSuggestions.push(match);
-          });
-        } else if (fav.url) {
-          // If it's a regular favorite
-          const match = processFavorite(fav);
-          if (match) allFavoriteSuggestions.push(match);
-        }
-      });
-
-      // Process history items
-      const historySuggestions = history
-        .filter(
-          (entry) =>
-            !entry.url.startsWith("https://www.bing.com/search?q=") &&
-            (entry.title?.toLowerCase().includes(normalizedInput) ||
-              entry.url.toLowerCase().includes(normalizedInput))
-        )
-        .slice(0, 5) // Limit history suggestions
-        .map((entry) => ({
-          title: entry.title || entry.url,
-          url: entry.url,
-          type: "history" as const,
-          year: entry.year,
-          favicon: entry.favicon,
-          normalizedUrl: normalizeUrlInline(entry.url),
-        }));
-
-      // Combine all suggestions
-      const combinedSuggestions = [
-        ...allFavoriteSuggestions,
-        ...historySuggestions,
-      ];
-
-      // Deduplicate based on normalized URL
-      const uniqueUrls = new Set<string>();
-      const dedupedSuggestions = combinedSuggestions.filter((suggestion) => {
-        if (
-          !suggestion.normalizedUrl ||
-          uniqueUrls.has(suggestion.normalizedUrl)
-        ) {
-          return false;
-        }
-        uniqueUrls.add(suggestion.normalizedUrl);
-        return true;
-      });
-
-      // Create final suggestions without the normalizedUrl property
-      const finalSuggestions: SuggestionItem[] = dedupedSuggestions.map(
-        (item) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { normalizedUrl, ...rest } = item;
-          return rest;
-        }
-      );
-
-      if (inputValue.trim() && !isValidUrl(inputValue)) {
-        finalSuggestions.push({
-          title: `${t("apps.internet-explorer.search")} "${inputValue}"`,
-          url: `bing:${inputValue}`, // Special marker for search
-          type: "search" as const,
-          favicon: "/icons/bing.png", // Assumes a bing icon exists
-        });
-      }
-
-      setFilteredSuggestions(finalSuggestions);
-      setSelectedSuggestionIndex(finalSuggestions.length > 0 ? 0 : -1);
-    },
-    [favorites, history, isValidUrl, t]
-  );
+  const handleHome = useCallback(() => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    if (iframeRef.current) iframeRef.current.src = "about:blank";
+    setStatus("idle");
+    setCurrentPageTitle(null);
+    setErrorMessage(null);
+    setFinalUrl(null);
+    setErrorDetails(null);
+  }, [setCurrentPageTitle, setErrorMessage]);
 
   const handleGoBack = useCallback(() => {
     if (historyIndex < history.length - 1) {
       setNavigatingHistory(true);
       const nextIndex = historyIndex + 1;
       setHistoryIndex(nextIndex);
-      const entry = history[nextIndex];
-      handleNavigate(entry.url, entry.year || "current", false);
+      handleNavigate(history[nextIndex].url);
     }
-  }, [
-    history,
-    historyIndex,
-    setHistoryIndex,
-    handleNavigate,
-    setNavigatingHistory,
-  ]);
+  }, [history, historyIndex, setHistoryIndex, handleNavigate, setNavigatingHistory]);
 
   const handleGoForward = useCallback(() => {
     if (historyIndex > 0) {
       setNavigatingHistory(true);
       const nextIndex = historyIndex - 1;
       setHistoryIndex(nextIndex);
-      const entry = history[nextIndex];
-      handleNavigate(entry.url, entry.year || "current", false);
+      handleNavigate(history[nextIndex].url);
     }
-  }, [
-    history,
-    historyIndex,
-    setHistoryIndex,
-    handleNavigate,
-    setNavigatingHistory,
-  ]);
-  const latestNavigateRef = useRef(handleNavigate);
-  const latestGoBackRef = useRef(handleGoBack);
-  const latestYearRef = useRef(year);
-
-  useEffect(() => {
-    latestNavigateRef.current = handleNavigate;
-  }, [handleNavigate]);
-
-  useEffect(() => {
-    latestGoBackRef.current = handleGoBack;
-  }, [handleGoBack]);
-
-  useEffect(() => {
-    latestYearRef.current = year;
-  }, [year]);
-
-  const handleAddFavorite = useCallback(() => {
-    const titleSource =
-      currentPageTitle ||
-      (() => {
-        try {
-          // If finalUrl exists and is an absolute http/https URL, use it directly.
-          if (finalUrl && finalUrl.startsWith("http")) {
-            return new URL(finalUrl).hostname;
-          }
-          // If finalUrl is a relative path (e.g. starts with /api/iframe-check), fall back to the main url.
-          const candidate =
-            finalUrl && !finalUrl.startsWith("/") ? finalUrl : url;
-          if (candidate) {
-            return new URL(
-              candidate.startsWith("http") ? candidate : `https://${candidate}`
-            ).hostname;
-          }
-        } catch (error) {
-          console.error(
-            "[IE] Error extracting hostname for favorite title:",
-            error
-          );
-        }
-        return t("apps.internet-explorer.page");
-      })();
-    setNewFavoriteTitle(titleSource);
-    setTitleDialogOpen(true);
-  }, [
-    currentPageTitle,
-    finalUrl,
-    url,
-    setNewFavoriteTitle,
-    setTitleDialogOpen,
-    t,
-  ]);
-
-  const handleTitleSubmit = useCallback(() => {
-    if (!newFavoriteTitle) return;
-    const favUrl = url;
-    const favHostname = (() => {
-      try {
-        if (finalUrl && finalUrl.startsWith("http")) {
-          return new URL(finalUrl).hostname;
-        }
-        const candidate =
-          finalUrl && !finalUrl.startsWith("/") ? finalUrl : favUrl;
-        if (candidate) {
-          return new URL(
-            candidate.startsWith("http") ? candidate : `https://${candidate}`
-          ).hostname;
-        }
-      } catch (error) {
-        console.error(
-          "[IE] Error extracting hostname for favorite icon:",
-          error
-        );
-      }
-      return "unknown.com";
-    })();
-    const favIcon = `https://www.google.com/s2/favicons?domain=${favHostname}&sz=32`;
-    addFavorite({
-      title: newFavoriteTitle,
-      url: favUrl,
-      favicon: favIcon,
-      year: year !== "current" ? year : undefined,
-    });
-    setTitleDialogOpen(false);
-  }, [newFavoriteTitle, addFavorite, finalUrl, url, year, setTitleDialogOpen]);
-
-  const handleResetFavorites = useCallback(() => {
-    clearFavorites();
-    DEFAULT_FAVORITES.forEach((fav) => addFavorite(fav));
-    setResetFavoritesDialogOpen(false);
-  }, [clearFavorites, addFavorite, setResetFavoritesDialogOpen]);
-
-  const handleClearFavorites = useCallback(() => {
-    clearFavorites();
-    setClearFavoritesDialogOpen(false);
-  }, [clearFavorites, setClearFavoritesDialogOpen]);
-
-  const handleRefresh = useCallback(() => {
-    if (abortControllerRef.current) abortControllerRef.current.abort();
-    clearIframeLoadTimeout();
-    if (iframeRef.current) iframeRef.current.src = "about:blank";
-    handleNavigate(url, year, true);
-  }, [handleNavigate, url, year, clearIframeLoadTimeout]);
-
-  const handleStop = useCallback(() => {
-    clearIframeLoadTimeout();
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    cancel();
-    if (isAiLoading) {
-      stopGeneration();
-    }
-    if (iframeRef.current) {
-      iframeRef.current.src = "about:blank";
-    }
-    clearErrorDetails();
-
-    if (stopElevatorMusic) {
-      stopElevatorMusic();
-    }
-  }, [
-    cancel,
-    clearIframeLoadTimeout,
-    isAiLoading,
-    stopGeneration,
-    clearErrorDetails,
-    stopElevatorMusic,
-  ]);
+  }, [history, historyIndex, setHistoryIndex, handleNavigate, setNavigatingHistory]);
 
   const handleGoToUrl = useCallback(() => {
     urlInputRef.current?.focus();
@@ -1226,702 +319,254 @@ export function useInternetExplorerLogic({
     setIsSelectingText(true);
   }, []);
 
-  const handleHome = useCallback(() => {
-    // Return to start page — clear iframe and reset state to idle
-    clearIframeLoadTimeout();
-    abortControllerRef.current?.abort();
-    if (iframeRef.current) iframeRef.current.src = "about:blank";
-    cancel();
-  }, [clearIframeLoadTimeout, cancel]);
+  // --- Favorites ---
+  const handleAddFavorite = useCallback(() => {
+    const titleSource =
+      currentPageTitle ||
+      (() => {
+        try {
+          if (url) return new URL(url.startsWith("http") ? url : `https://${url}`).hostname;
+        } catch {}
+        return t("apps.internet-explorer.page");
+      })();
+    setNewFavoriteTitle(titleSource);
+    setTitleDialogOpen(true);
+  }, [currentPageTitle, url, setNewFavoriteTitle, setTitleDialogOpen, t]);
 
-  // Use a ref to prevent duplicate initial navigations
+  const handleTitleSubmit = useCallback(() => {
+    if (!newFavoriteTitle) return;
+    const favHostname = (() => {
+      try {
+        if (url) return new URL(url.startsWith("http") ? url : `https://${url}`).hostname;
+      } catch {}
+      return "unknown.com";
+    })();
+    addFavorite({
+      title: newFavoriteTitle,
+      url,
+      favicon: `https://www.google.com/s2/favicons?domain=${favHostname}&sz=32`,
+    });
+    setTitleDialogOpen(false);
+  }, [newFavoriteTitle, addFavorite, url, setTitleDialogOpen]);
+
+  const handleResetFavorites = useCallback(() => {
+    clearFavorites();
+    DEFAULT_FAVORITES.forEach((fav) => addFavorite(fav));
+  }, [clearFavorites, addFavorite]);
+
+  const handleClearFavorites = useCallback(() => {
+    clearFavorites();
+    setClearFavoritesDialogOpen(false);
+  }, [clearFavorites, setClearFavoritesDialogOpen]);
+
+  // --- Suggestions ---
+  const handleFilterSuggestions = useCallback(
+    (inputValue: string) => {
+      if (!inputValue.trim()) {
+        const flat: SuggestionItem[] = [];
+        favorites.forEach((fav) => {
+          if (!fav.children && fav.url) {
+            flat.push({ title: fav.title || "", url: fav.url, type: "favorite" as const, year: fav.year, favicon: fav.favicon });
+          }
+        });
+        favorites.forEach((fav) => {
+          if (fav.children) {
+            fav.children.forEach((child) => {
+              if (child.url) {
+                flat.push({ title: child.title || "", url: child.url, type: "favorite" as const, year: child.year, favicon: child.favicon });
+              }
+            });
+          }
+        });
+        setFilteredSuggestions(flat);
+        setSelectedSuggestionIndex(flat.length > 0 ? 0 : -1);
+        return;
+      }
+      const ni = inputValue.toLowerCase();
+      const match = (fav: Favorite) =>
+        fav.title?.toLowerCase().includes(ni) || fav.url?.toLowerCase().includes(ni)
+          ? { title: fav.title || "", url: fav.url || "", type: "favorite" as const, year: fav.year, favicon: fav.favicon, normalizedUrl: normalizeUrlInline(fav.url || "") }
+          : null;
+
+      const favMatches: Array<SuggestionItem> = [];
+      favorites.forEach((fav) => {
+        if (fav.children) fav.children.forEach((c) => { const m = match(c); if (m) favMatches.push(m); });
+        else if (fav.url) { const m = match(fav); if (m) favMatches.push(m); }
+      });
+      const histMatches = history
+        .filter((e) => !e.url.startsWith("https://www.bing.com/search?q=") && (e.title?.toLowerCase().includes(ni) || e.url.toLowerCase().includes(ni)))
+        .slice(0, 5)
+        .map((e) => ({ title: e.title || e.url, url: e.url, type: "history" as const, favicon: e.favicon, normalizedUrl: normalizeUrlInline(e.url) }));
+      const merged = [...favMatches, ...histMatches];
+      const seen = new Set<string>();
+      const deduped: SuggestionItem[] = [];
+      merged.forEach((s) => {
+        if (!s.normalizedUrl || seen.has(s.normalizedUrl)) return;
+        seen.add(s.normalizedUrl);
+        const { normalizedUrl, ...rest } = s;
+        deduped.push(rest);
+      });
+      if (inputValue.trim() && !isValidUrl(inputValue)) {
+        deduped.push({
+          title: `${t("apps.internet-explorer.search")} "${inputValue}"`,
+          url: `bing:${inputValue}`,
+          type: "search" as const,
+          favicon: "/icons/bing.png",
+        });
+      }
+      setFilteredSuggestions(deduped);
+      setSelectedSuggestionIndex(deduped.length > 0 ? 0 : -1);
+    },
+    [favorites, history, isValidUrl, normalizeUrlInline, t]
+  );
+
+  // --- Share ---
+  const handleSharePage = useCallback(() => { setIsShareDialogOpen(true); }, []);
+  const ieGenerateShareUrl = useCallback(
+    (identifier: string, secondaryIdentifier?: string) => {
+      const combined = `${identifier}|${secondaryIdentifier || "current"}`;
+      const code = btoa(combined).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      return `${window.location.origin}/internet-explorer/${code}`;
+    },
+    []
+  );
+
+  // --- Initial nav ---
   const initialNavigationRef = useRef(false);
-  // Track the last processed initialData to avoid duplicates
   const lastProcessedInitialDataRef = useRef<unknown>(null);
 
   useEffect(() => {
-    // Only run initial navigation logic once when the window opens
     if (!initialNavigationRef.current && isWindowOpen) {
       initialNavigationRef.current = true;
-      let shouldRunDefaultNavigation = true;
-      log.debug("Running initial navigation check", {
-        hasInitialData: Boolean(initialData),
-        hasShareCode: Boolean(initialData?.shareCode),
-        hasUrl: Boolean(initialData?.url),
-      });
-
-      // Check if initialData contains a shareCode (passed via props on first open)
-      if (initialData?.shareCode) {
-        const code = initialData.shareCode;
-        const decodedData = decodeData(code);
-
-        if (decodedData) {
-          log.debug("Decoded share link from initialData prop", {
-            url: decodedData.url,
-            year: decodedData.year,
-          });
-          toast.info(t("apps.internet-explorer.openingSharedPage"), {
-            description: getSharedPageToastDescription(decodedData),
-            duration: 4000,
-          });
-          // Navigate synchronously to avoid cleanup races dropping first-open navigation
-          handleNavigate(decodedData.url, decodedData.year || "current", false);
-          // Clear initialData after navigation is initiated
-          if (instanceId) {
-            clearInstanceInitialData(instanceId);
-          }
-          // Mark this initialData as processed
+      const typedData = initialData as InternetExplorerInitialData | undefined;
+      if (typedData?.shareCode) {
+        const decoded = decodeData(typedData.shareCode);
+        if (decoded) {
+          toast.info(t("apps.internet-explorer.openingSharedPage"), { description: getSharedPageToastDescription(decoded), duration: 4000 });
+          handleNavigate(decoded.url);
+          if (instanceId) clearInstanceInitialData(instanceId);
           lastProcessedInitialDataRef.current = initialData;
-          shouldRunDefaultNavigation = false;
         } else {
-          console.warn(
-            "[IE] Failed to decode share link code from initialData prop."
-          );
           showInvalidShareLinkToast();
-          // Fall through to check for direct url/year or default navigation
         }
-      }
-
-      // --- NEW: Check for direct url and year in initialData ---
-      if (
-        shouldRunDefaultNavigation &&
-        initialData?.url &&
-        typeof initialData.url === "string"
-      ) {
-        const initialUrl = initialData.url;
-        const initialYear =
-          typeof initialData.year === "string"
-            ? initialData.year
-            : "current"; // Default to 'current' if year is missing or invalid
-        log.debug("Navigating from initialData url/year", {
-          url: initialUrl,
-          year: initialYear,
-        });
-
-        // --- FIX: Update store state BEFORE navigating and pass values directly ---
-        setUrl(initialUrl);
-        setYear(initialYear);
-        // --- END FIX ---
-        // --- FIX: Pass initialUrl and initialYear directly ---
-        handleNavigate(initialUrl, initialYear, false);
-        // Clear initialData after navigation is initiated
-        if (instanceId) {
-          clearInstanceInitialData(instanceId);
-        }
-        // --- END FIX ---
-        // Mark this initialData as processed
-        lastProcessedInitialDataRef.current = initialData;
-        shouldRunDefaultNavigation = false;
-      }
-      // --- END NEW ---
-
-      // If no initialData navigation was queued, show the start page
-      // by staying in "idle" state. No auto-navigation needed — the
-      // start page provides search and quick links.
-      if (shouldRunDefaultNavigation) {
-        log.debug("No initial data — showing start page");
-        // Stay in idle state so the start page renders
-      }
-    }
-  }, [
-    initialData,
-    isWindowOpen,
-    handleNavigate,
-    url,
-    year,
-    clearInstanceInitialData,
-    instanceId,
-    setUrl,
-    setYear,
-    t,
-    getSharedPageToastDescription,
-    showInvalidShareLinkToast,
-  ]);
-
-  // --- Watch for initialData changes when app is already open ---
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-    // Only react to initialData changes if the window is already open and we have initialData
-    if (!isWindowOpen || !initialData) return;
-
-    // Skip if this initialData has already been processed
-    if (lastProcessedInitialDataRef.current === initialData) return;
-
-    // Only process if this is NOT the initial mount (initial navigation has already happened)
-    if (initialNavigationRef.current === true) {
-      log.debug("Detected initialData change for open window", {
-        hasShareCode: Boolean((initialData as InternetExplorerInitialData).shareCode),
-        hasUrl: Boolean((initialData as InternetExplorerInitialData).url),
-      });
-
-      const typedInitialData = initialData as InternetExplorerInitialData;
-
-      if (typedInitialData.shareCode) {
-        const code = typedInitialData.shareCode;
-        const decodedData = decodeData(code);
-
-        if (decodedData) {
-          log.debug("Navigating to shared link", {
-            url: decodedData.url,
-            year: decodedData.year,
-          });
-          toast.info(t("apps.internet-explorer.openingSharedPage"), {
-            description: getSharedPageToastDescription(decodedData),
-            duration: 4000,
-          });
-          timeoutId = setTimeout(() => {
-            handleNavigate(
-              decodedData.url,
-              decodedData.year || "current",
-              false
-            );
-            // Clear initialData after navigation
-            if (instanceId) {
-              clearInstanceInitialData(instanceId);
-            }
-          }, 50);
-          // Mark this initialData as processed
-          lastProcessedInitialDataRef.current = initialData;
-        }
-      } else if (
-        typedInitialData.url &&
-        typeof typedInitialData.url === "string"
-      ) {
-        const navUrl = typedInitialData.url;
-        const navYear =
-          typeof typedInitialData.year === "string"
-            ? typedInitialData.year
-            : "current";
-
-        log.debug("Navigating to direct url/year", {
-          url: navUrl,
-          year: navYear,
-        });
-
-        timeoutId = setTimeout(() => {
-          handleNavigate(navUrl, navYear, false);
-          // Clear initialData after navigation
-          if (instanceId) {
-            clearInstanceInitialData(instanceId);
-          }
-        }, 50);
-        // Mark this initialData as processed
+      } else if (typedData?.url) {
+        setUrl(typedData.url);
+        handleNavigate(typedData.url);
+        if (instanceId) clearInstanceInitialData(instanceId);
         lastProcessedInitialDataRef.current = initialData;
       }
     }
-    return () => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [
-    isWindowOpen,
-    initialData,
-    handleNavigate,
-    clearInstanceInitialData,
-    instanceId,
-    t,
-    getSharedPageToastDescription,
-  ]);
+  }, [initialData, isWindowOpen, handleNavigate, clearInstanceInitialData, instanceId, setUrl, t, getSharedPageToastDescription, showInvalidShareLinkToast]);
 
-  // --- Add listener for updateApp event (handles share links when app is already open) ---
+  // --- Re-open initial data ---
   useEffect(() => {
-    const timeoutIds = new Set<ReturnType<typeof setTimeout>>();
-    const scheduleTimeout = (callback: () => void, delay: number) => {
-      const timeoutId = setTimeout(() => {
-        timeoutIds.delete(timeoutId);
-        callback();
-      }, delay);
-      timeoutIds.add(timeoutId);
-      return timeoutId;
-    };
-
-    // Define a type for the initialData expected in the event detail
-    interface AppUpdateInitialData {
-      shareCode?: string;
-      url?: string; // Add url
-      year?: string; // Add year
+    if (!isWindowOpen || !initialData || lastProcessedInitialDataRef.current === initialData || !initialNavigationRef.current) return;
+    const typedData = initialData as InternetExplorerInitialData;
+    if (typedData.shareCode) {
+      const decoded = decodeData(typedData.shareCode);
+      if (decoded) {
+        toast.info(t("apps.internet-explorer.openingSharedPage"), { description: getSharedPageToastDescription(decoded), duration: 4000 });
+        setTimeout(() => { handleNavigate(decoded.url); if (instanceId) clearInstanceInitialData(instanceId); }, 50);
+        lastProcessedInitialDataRef.current = initialData;
+      }
+    } else if (typedData.url) {
+      setTimeout(() => { handleNavigate(typedData.url); if (instanceId) clearInstanceInitialData(instanceId); }, 50);
+      lastProcessedInitialDataRef.current = initialData;
     }
+  }, [isWindowOpen, initialData, handleNavigate, clearInstanceInitialData, instanceId, t, getSharedPageToastDescription]);
 
-    const handleUpdateApp = (
-      event: CustomEvent<{
-        appId: string;
-        instanceId?: string;
-        initialData?: unknown;
-      }>
-    ) => {
-      if (
-        event.detail.appId === "internet-explorer" &&
-        (!event.detail.instanceId || event.detail.instanceId === instanceId)
-      ) {
-        const initialData = event.detail.initialData as
-          | AppUpdateInitialData
-          | undefined;
-
-        // Skip if this initialData has already been processed
-        if (lastProcessedInitialDataRef.current === initialData) return;
-
-        if (initialData?.shareCode) {
-          const code = initialData.shareCode;
-          log.debug("Received updateApp event with share code", {
-            hasShareCode: Boolean(code),
-          });
-          const decodedData = decodeData(code);
-
-          if (decodedData) {
-            log.debug("Decoded share link from updateApp event", {
-              url: decodedData.url,
-              year: decodedData.year,
-            });
-
-            // Show toast and navigate
-            toast.info(t("apps.internet-explorer.openingSharedPage"), {
-              description: getSharedPageToastDescription(decodedData),
-              duration: 4000,
-            });
-            // Use timeout to allow potential state updates (like foreground) to settle
-            scheduleTimeout(() => {
-              handleNavigate(
-                decodedData.url,
-                decodedData.year || "current",
-                false
-              );
-            }, 50); // Small delay
-            // Mark this initialData as processed
-            lastProcessedInitialDataRef.current = initialData;
-          } else {
-            console.warn(
-              "[IE] Failed to decode share link code from updateApp event."
-            );
-            showInvalidShareLinkToast();
-          }
-        } else if (initialData?.url && typeof initialData.url === "string") {
-          // --- NEW: Handle direct url/year from updateApp event ---
-          const directUrl = initialData.url;
-          const directYear =
-            typeof initialData.year === "string" ? initialData.year : "current";
-          log.debug("Received updateApp event with direct url/year", {
-            url: directUrl,
-            year: directYear,
-          });
-
-          // Use timeout to allow potential state updates (like foreground) to settle
-          scheduleTimeout(() => {
-            handleNavigate(directUrl, directYear, false);
-          }, 50); // Small delay
-          // Mark this initialData as processed
-          lastProcessedInitialDataRef.current = initialData;
-          // --- END NEW ---
+  // --- updateApp events ---
+  useEffect(() => {
+    const cb = (event: CustomEvent<{ appId: string; instanceId?: string; initialData?: unknown }>) => {
+      if (event.detail.appId !== "internet-explorer") return;
+      if (event.detail.instanceId && event.detail.instanceId !== instanceId) return;
+      const evData = event.detail.initialData as { shareCode?: string; url?: string } | undefined;
+      if (!evData || lastProcessedInitialDataRef.current === evData) return;
+      if (evData.shareCode) {
+        const decoded = decodeData(evData.shareCode);
+        if (decoded) {
+          toast.info(t("apps.internet-explorer.openingSharedPage"), { description: getSharedPageToastDescription(decoded), duration: 4000 });
+          setTimeout(() => handleNavigate(decoded.url), 50);
+          lastProcessedInitialDataRef.current = evData;
         }
+      } else if (evData.url) {
+        setTimeout(() => handleNavigate(evData.url), 50);
+        lastProcessedInitialDataRef.current = evData;
       }
     };
+    const unsub = onAppUpdate(cb);
+    return () => unsub();
+  }, [handleNavigate, instanceId, t, getSharedPageToastDescription]);
 
-    const unsubscribe = onAppUpdate(handleUpdateApp);
-    return () => {
-      unsubscribe();
-      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
-      timeoutIds.clear();
-    };
-    // Add isForeground to dependencies to refresh navigation when focus changes
-  }, [
-    handleNavigate,
-    isForeground,
-    instanceId,
-    t,
-    getSharedPageToastDescription,
-    showInvalidShareLinkToast,
-  ]);
-  // --- End updateApp listener ---
-
+  // --- Wheel scroll for favorites ---
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const messageData = event.data as
-        | { type?: string; url?: string }
-        | undefined;
-      if (!messageData?.type) {
-        return;
-      }
-
-      // Only accept messages from the current window origin.
-      // This blocks untrusted cross-origin frames from driving navigation.
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      // For iframe-driven controls, ensure the sender is our active iframe.
-      // aiHtmlNavigation is emitted by HtmlPreview's internal iframe(s), so it
-      // is validated by same-origin only.
-      const sourceWindow = event.source as Window | null;
-      const currentIframeWindow = iframeRef.current?.contentWindow ?? null;
-      const isFromActiveIframe =
-        !!sourceWindow &&
-        !!currentIframeWindow &&
-        sourceWindow === currentIframeWindow;
-
-      if (
-        messageData.type !== "aiHtmlNavigation" &&
-        !isFromActiveIframe
-      ) {
-        return;
-      }
-
-      if (
-        messageData.type === "iframeNavigation" &&
-        typeof messageData.url === "string"
-      ) {
-        log.debug("Received navigation request from iframe", {
-          url: messageData.url,
-        });
-        // A link click inside the page is a brand-new navigation, not a
-        // back/forward traversal. Clear the history-navigation flag so the
-        // destination is recorded in history (and any forward stack is
-        // truncated) by loadSuccess.
-        useInternetExplorerStore.getState().setNavigatingHistory(false);
-        latestNavigateRef.current(messageData.url, latestYearRef.current);
-      } else if (
-        messageData.type === "iframeOpenWindow" &&
-        typeof messageData.url === "string"
-      ) {
-        // target=_blank / window.open from the proxied iframe — open outside
-        // IE (e.g. Reader Mode "Open original") instead of navigating in-place.
-        log.debug("Received open-window request from iframe", {
-          url: messageData.url,
-        });
-        window.open(messageData.url, "_blank", "noopener,noreferrer");
-      } else if (messageData.type === "goBack") {
-        log.debug("Received back button request from iframe");
-        latestGoBackRef.current();
-      } else if (
-        messageData.type === "aiHtmlNavigation" &&
-        typeof messageData.url === "string"
-      ) {
-        log.debug("Received navigation request from AI HTML preview", {
-          url: messageData.url,
-        });
-        // Same as above: clicking a link in AI-generated content is a new
-        // navigation and must be tracked in history.
-        useInternetExplorerStore.getState().setNavigatingHistory(false);
-        // Fetch the most up-to-date HTML from the store in case the closure is stale
-        const contextHtml =
-          useInternetExplorerStore.getState().aiGeneratedHtml;
-
-        latestNavigateRef.current(
-          messageData.url,
-          latestYearRef.current,
-          false,
-          contextHtml
-        );
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isWindowOpen) {
-      if (stopElevatorMusic) {
-        stopElevatorMusic();
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      if (iframeRef.current) {
-        iframeRef.current.src = "about:blank";
-      }
-    }
-  }, [isWindowOpen, stopElevatorMusic]);
-
-  useEffect(() => {
-    const container = favoritesContainerRef.current;
-
-    const handleWheel = (e: WheelEvent) => {
-      if (!container) return;
+    const c = favoritesContainerRef.current;
+    if (!c) return;
+    const h = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        container.scrollLeft += e.deltaY;
+        c.scrollLeft += e.deltaY;
       }
     };
-
-    if (container) {
-      container.addEventListener("wheel", handleWheel, { passive: false });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("wheel", handleWheel);
-      }
-    };
+    c.addEventListener("wheel", h, { passive: false });
+    return () => c.removeEventListener("wheel", h);
   }, []);
 
+  // --- Dropdown resize ---
   useEffect(() => {
-    if (!isAiLoading && !isFetchingWebsiteContent && status !== "loading") {
-      if (stopElevatorMusic) {
-        stopElevatorMusic();
-      }
-    }
-  }, [isAiLoading, isFetchingWebsiteContent, status, stopElevatorMusic]);
-
-  const getDebugStatusMessage = (): ReactNode => {
-    if (!(status === "loading" || isAiLoading || isFetchingWebsiteContent))
-      return null;
-
-    const hostname = url ? getHostnameFromUrl(url) : "unknown";
-    const aiModel = useAppStore.getState().aiModel;
-    const modelInfo = aiModel ? `${aiModel} ` : "";
-
-    // Get language and location display names
-    const languageDisplayName =
-      language !== "auto" ? getLanguageDisplayName(language) : "";
-    const locationDisplayName =
-      location !== "auto" ? getLocationDisplayName(location) : "";
-
-    if (isFetchingWebsiteContent) {
-      return React.createElement(
-        "div",
-        { className: "flex items-center gap-1" },
-        debugMode &&
-          React.createElement(
-            "span",
-            { className: "text-neutral-500" },
-            t("apps.internet-explorer.fetch")
-          ),
-        React.createElement(
-          "span",
-          null,
-          t("apps.internet-explorer.fetchingContentForReconstruction", {
-            hostname,
-          })
-        )
-      );
-    }
-
-    switch (mode) {
-      case "future":
-        return React.createElement(
-          "div",
-          { className: "flex items-center gap-1" },
-          debugMode &&
-            React.createElement(
-              "span",
-              { className: "text-neutral-500" },
-              modelInfo,
-              language !== "auto" && ` ${languageDisplayName}`,
-              location !== "auto" && ` ${locationDisplayName}`
-            ),
-          React.createElement(
-            "span",
-            null,
-            t("apps.internet-explorer.reimaginingForYear", {
-              hostname,
-              year,
-            })
-          )
-        );
-      case "past":
-        if (parseInt(year) <= 1995) {
-          return React.createElement(
-            "div",
-            { className: "flex items-center gap-1" },
-            debugMode &&
-              React.createElement(
-                "span",
-                { className: "text-neutral-500" },
-                modelInfo,
-                language !== "auto" && ` ${languageDisplayName}`,
-                location !== "auto" && ` ${locationDisplayName}`
-              ),
-            React.createElement(
-              "span",
-              null,
-              t("apps.internet-explorer.reconstructingHistoryForYear", {
-                hostname,
-                year,
-              })
-            )
-          );
+    const update = () => {
+      if (isUrlDropdownOpen && urlInputRef.current) {
+        const mobile = window.innerWidth < 640;
+        if (mobile) {
+          const rect = urlInputRef.current.getBoundingClientRect();
+          setDropdownStyle({ position: "fixed", top: `${rect.bottom}px`, left: "1rem", right: "1rem", zIndex: 50 });
+        } else {
+          setDropdownStyle({});
         }
-        return t("apps.internet-explorer.fetchingFromYear", { hostname, year });
-      case "now":
-        return t("apps.internet-explorer.loading", { hostname });
-      default:
-        return t("apps.internet-explorer.loading", { hostname });
-    }
-  };
-
-  // --- Add custom sorting logic for TimeMachineView ---
-  const chronologicallySortedYears = useMemo(() => {
-    const parseYear = (yearStr: string): number => {
-      if (yearStr === "current")
-        return new Date().getFullYear() + 0.5; // Place 'current' slightly after the current year number
-      if (yearStr.endsWith(" BC")) {
-        return -parseInt(yearStr.replace(" BC", ""), 10);
+      } else {
+        setDropdownStyle({});
       }
-      if (yearStr.endsWith(" CE")) {
-        return parseInt(yearStr.replace(" CE", ""), 10);
-      }
-      const yearNum = parseInt(yearStr, 10);
-      return isNaN(yearNum) ? Infinity : yearNum; // Handle potential non-numeric strings
     };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [isUrlDropdownOpen, setDropdownStyle]);
 
-    return [...cachedYears].sort((a, b) => parseYear(a) - parseYear(b));
-  }, [cachedYears]);
-  // --- End custom sorting logic ---
+const isOffline = useOffline();
 
-  const handleSharePage = useCallback(() => {
-    setIsShareDialogOpen(true);
+  const handleIframeLoad = useCallback(() => {
+    setStatus("idle");
   }, []);
 
-  const isOffline = useOffline();
+  const handleIframeError = useCallback(() => {
+    setStatus("error");
+    setErrorDetails(t("apps.internet-explorer.pageCouldNotBeLoaded"));
+  }, [t]);
 
   return {
-    // Store state
-    url,
-    year,
-    mode,
-    token,
-    favorites,
-    history,
-    historyIndex,
-    isTitleDialogOpen,
-    newFavoriteTitle,
-    isHelpDialogOpen,
-    isAboutDialogOpen,
-    isNavigatingHistory,
-    isClearFavoritesDialogOpen,
-    isClearHistoryDialogOpen,
-    currentPageTitle,
-    timelineSettings,
-    status,
-    finalUrl,
-    aiGeneratedHtml,
-    errorDetails,
-    isResetFavoritesDialogOpen,
-    isFutureSettingsDialogOpen,
-    language,
-    location,
-    isTimeMachineViewOpen,
-    cachedYears,
-    isFetchingCachedYears,
+    url, favorites, history, historyIndex, isTitleDialogOpen, newFavoriteTitle,
+    isHelpDialogOpen, isAboutDialogOpen, isClearFavoritesDialogOpen, isClearHistoryDialogOpen,
+    currentPageTitle, errorMessage, finalUrl, status, errorDetails,
 
-    // Store actions
-    setUrl,
-    setYear,
-    setTitleDialogOpen,
-    setNewFavoriteTitle,
-    setHelpDialogOpen,
-    setAboutDialogOpen,
-    setNavigatingHistory,
-    setClearFavoritesDialogOpen,
-    setClearHistoryDialogOpen,
-    clearErrorDetails,
-    setResetFavoritesDialogOpen,
-    setFutureSettingsDialogOpen,
-    setLanguage,
-    setLocation,
-    setTimeMachineViewOpen,
-    clearHistory,
-    addFavorite,
-    clearFavorites,
+    setUrl, setTitleDialogOpen, setNewFavoriteTitle, setHelpDialogOpen, setAboutDialogOpen,
+    setClearFavoritesDialogOpen, setClearHistoryDialogOpen, clearHistory, addFavorite, clearFavorites,
 
-    // Local state
-    hasMoreToScroll,
-    isUrlDropdownOpen,
-    setIsUrlDropdownOpen,
-    filteredSuggestions,
-    setFilteredSuggestions,
-    localUrl,
-    setLocalUrl,
-    isSelectingText,
-    setIsSelectingText,
-    selectedSuggestionIndex,
-    setSelectedSuggestionIndex,
-    dropdownStyle,
-    displayTitle,
-    isShareDialogOpen,
-    setIsShareDialogOpen,
+    hasMoreToScroll, isUrlDropdownOpen, setIsUrlDropdownOpen, filteredSuggestions,
+    localUrl, setLocalUrl, isSelectingText, setIsSelectingText,
+    selectedSuggestionIndex, setSelectedSuggestionIndex, dropdownStyle,
+    displayTitle, isShareDialogOpen, setIsShareDialogOpen,
 
-    // Refs
-    urlInputRef,
-    iframeRef,
-    favoritesContainerRef,
-    abortControllerRef,
-    navTokenRef,
+    urlInputRef, iframeRef, favoritesContainerRef,
 
-    // AI generation
-    generatedHtml,
-    isAiLoading,
-    isFetchingWebsiteContent,
-    stopGeneration,
+    currentTheme, isWindowsTheme, isOffline,
 
-    // Sounds
-    playElevatorMusic,
-    stopElevatorMusic,
-    playDingSound,
+    handleNavigate, handleNavigateWithHistory, handleFilterSuggestions,
+    handleGoBack, handleGoForward, handleAddFavorite, handleTitleSubmit,
+    handleResetFavorites, handleClearFavorites, handleRefresh, handleStop,
+    handleGoToUrl, handleHome, handleSharePage, handleIframeLoad, handleIframeError,
 
-    // Theme and settings
-    currentTheme,
-    isWindowsTheme,
-    debugMode,
-    terminalSoundsEnabled,
-    isOffline,
-
-    // Debug menu (admin / debug-mode only)
-    showDebugMenu,
-    debugProxySessions,
-    debugForceHeadless,
-    debugVerboseLogging,
-    setDebugProxySessions,
-    setDebugForceHeadless,
-    setDebugVerboseLogging,
-
-    // Years
-    pastYears,
-    futureYears,
-    isFutureYear,
-    chronologicallySortedYears,
-
-    // Loading state
-    isLoading,
-    loadingBarVariants,
-
-    // Handlers
-    handleNavigate,
-    handleNavigateWithHistory,
-    handleFilterSuggestions,
-    handleGoBack,
-    handleGoForward,
-    handleAddFavorite,
-    handleTitleSubmit,
-    handleResetFavorites,
-    handleClearFavorites,
-    handleRefresh,
-    handleStop,
-    handleGoToUrl,
-    handleHome,
-    handleSharePage,
-    handleIframeLoad,
-    handleIframeError,
-
-    // Helpers
-    stripProtocol,
-    isValidUrl,
-    normalizeUrlInline,
-    normalizeUrlForHistory,
-    getLoadingTitle,
-    getDebugStatusMessage,
-    getLanguageDisplayName,
-    getLocationDisplayName,
-    ieGenerateShareUrl,
-
-    // App store actions
+    stripProtocol, isValidUrl, normalizeUrlInline, normalizeUrlForHistory: normalizeUrlInline, ieGenerateShareUrl,
     bringInstanceToForeground,
-    clearInstanceInitialData,
-
-    // Translation
-    t,
-    translatedHelpItems,
+    t, translatedHelpItems,
   };
 }

@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useAppMenuBarChrome } from "@/hooks/useAppMenuBarChrome";
 import type { InternetExplorerMenuBarProps } from "./types";
-import { getFutureYears, getPastYears } from "./yearLists";
 
 export type InternetExplorerMenuBarViewModel = ReturnType<
   typeof useInternetExplorerMenuBar
@@ -29,22 +28,7 @@ export function useInternetExplorerMenuBar(props: InternetExplorerMenuBarProps) 
     canGoBack,
     canGoForward,
     onClearHistory,
-    onOpenTimeMachine,
-    onEditFuture,
-    language = "auto",
-    location = "auto",
-    onLanguageChange,
-    onLocationChange,
-    year = "current",
-    onYearChange,
     onSharePage,
-    showDebugMenu = false,
-    debugProxySessions = false,
-    debugForceHeadless = false,
-    debugVerboseLogging = false,
-    onToggleProxySessions,
-    onToggleForceHeadless,
-    onToggleVerboseLogging,
   } = props;
 
   const { t } = useTranslation();
@@ -56,9 +40,6 @@ export function useInternetExplorerMenuBar(props: InternetExplorerMenuBarProps) 
     appId,
     appName,
   } = useAppMenuBarChrome("internet-explorer");
-  const currentYear = new Date().getFullYear();
-  const futureYears = getFutureYears(currentYear);
-  const pastYears = getPastYears(currentYear);
 
   return {
     t,
@@ -68,8 +49,6 @@ export function useInternetExplorerMenuBar(props: InternetExplorerMenuBarProps) 
     appName,
     isWindowsTheme,
     isMacOSTheme,
-    futureYears,
-    pastYears,
     onRefresh,
     onStop,
     onHome,
@@ -90,21 +69,6 @@ export function useInternetExplorerMenuBar(props: InternetExplorerMenuBarProps) 
     canGoBack,
     canGoForward,
     onClearHistory,
-    onOpenTimeMachine,
-    onEditFuture,
-    language,
-    location,
-    onLanguageChange,
-    onLocationChange,
-    year,
-    onYearChange,
     onSharePage,
-    showDebugMenu,
-    debugProxySessions,
-    debugForceHeadless,
-    debugVerboseLogging,
-    onToggleProxySessions,
-    onToggleForceHeadless,
-    onToggleVerboseLogging,
   };
 }

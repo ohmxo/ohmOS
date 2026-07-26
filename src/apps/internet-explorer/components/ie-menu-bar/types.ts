@@ -2,8 +2,6 @@ import type { AppProps } from "../../../base/types";
 import type {
   Favorite,
   HistoryEntry,
-  LanguageOption,
-  LocationOption,
 } from "@/stores/useInternetExplorerStore";
 
 /** Props for the Internet Explorer app menubar shell (`ie-menu-bar/`). */
@@ -31,22 +29,5 @@ export interface InternetExplorerMenuBarProps
   canGoBack?: boolean;
   canGoForward?: boolean;
   onClearHistory?: () => void;
-  onOpenTimeMachine?: () => void;
-  onEditFuture?: () => void;
-  language?: LanguageOption;
-  location?: LocationOption;
-  onLanguageChange?: (language: LanguageOption) => void;
-  onLocationChange?: (location: LocationOption) => void;
-  year?: string;
-  onYearChange?: (year: string) => void;
   onSharePage?: () => void;
-
-  // Debug menu (only rendered for the admin user or in global debug mode)
-  showDebugMenu?: boolean;
-  debugProxySessions?: boolean;
-  debugForceHeadless?: boolean;
-  debugVerboseLogging?: boolean;
-  onToggleProxySessions?: (enabled: boolean) => void;
-  onToggleForceHeadless?: (enabled: boolean) => void;
-  onToggleVerboseLogging?: (enabled: boolean) => void;
 }

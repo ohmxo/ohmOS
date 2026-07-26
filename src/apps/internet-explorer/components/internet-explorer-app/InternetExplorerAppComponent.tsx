@@ -29,8 +29,8 @@ export function InternetExplorerAppComponent({
 
   const {
     url,
-    year,
-    mode,
+    finalUrl,
+    status,
     favorites,
     history,
     historyIndex,
@@ -41,15 +41,7 @@ export function InternetExplorerAppComponent({
     isClearFavoritesDialogOpen,
     isClearHistoryDialogOpen,
     currentPageTitle,
-    status,
-    finalUrl,
-    aiGeneratedHtml,
-    errorDetails,
-    isResetFavoritesDialogOpen,
-    isFutureSettingsDialogOpen,
-    isTimeMachineViewOpen,
-    cachedYears,
-    isFetchingCachedYears,
+    errorMessage,
     hasMoreToScroll,
     isUrlDropdownOpen,
     setIsUrlDropdownOpen,
@@ -67,21 +59,9 @@ export function InternetExplorerAppComponent({
     urlInputRef,
     iframeRef,
     favoritesContainerRef,
-    generatedHtml,
-    isAiLoading,
-    isFetchingWebsiteContent,
-    playElevatorMusic,
-    stopElevatorMusic,
-    playDingSound,
     currentTheme,
     isWindowsTheme,
     isOffline,
-    pastYears,
-    futureYears,
-    isFutureYear,
-    chronologicallySortedYears,
-    isLoading,
-    loadingBarVariants,
     handleNavigate,
     handleNavigateWithHistory,
     handleFilterSuggestions,
@@ -89,7 +69,6 @@ export function InternetExplorerAppComponent({
     handleGoForward,
     handleAddFavorite,
     handleTitleSubmit,
-    handleResetFavorites,
     handleClearFavorites,
     handleRefresh,
     handleStop,
@@ -110,23 +89,10 @@ export function InternetExplorerAppComponent({
     setClearFavoritesDialogOpen,
     setClearHistoryDialogOpen,
     clearHistory,
-    setResetFavoritesDialogOpen,
-    setFutureSettingsDialogOpen,
-    setTimeMachineViewOpen,
     translatedHelpItems,
     setUrl,
-    setLanguage,
-    setLocation,
     bringInstanceToForeground,
     t,
-    getDebugStatusMessage,
-    showDebugMenu,
-    debugProxySessions,
-    debugForceHeadless,
-    debugVerboseLogging,
-    setDebugProxySessions,
-    setDebugForceHeadless,
-    setDebugVerboseLogging,
   } = logic;
 
   const menuBar = (
@@ -139,14 +105,13 @@ export function InternetExplorerAppComponent({
       onHome={handleHome}
       onShowHelp={() => setHelpDialogOpen(true)}
       onShowAbout={() => setAboutDialogOpen(true)}
-      isLoading={isLoading}
+      isLoading={false}
       favorites={favorites}
       history={history}
       onAddFavorite={handleAddFavorite}
       onClearFavorites={() => setClearFavoritesDialogOpen(true)}
-      onResetFavorites={() => setResetFavoritesDialogOpen(true)}
-      onNavigateToFavorite={(favUrl, favYear) =>
-        handleNavigateWithHistory(favUrl, favYear)
+      onNavigateToFavorite={(favUrl) =>
+        handleNavigateWithHistory(favUrl)
       }
       onNavigateToHistory={handleNavigateWithHistory}
       onGoBack={handleGoBack}
@@ -154,23 +119,8 @@ export function InternetExplorerAppComponent({
       canGoBack={historyIndex < history.length - 1}
       canGoForward={historyIndex > 0}
       onClearHistory={() => setClearHistoryDialogOpen(true)}
-      onOpenTimeMachine={() => setTimeMachineViewOpen(true)}
       onClose={onClose}
-      onEditFuture={() => setFutureSettingsDialogOpen(true)}
-      language={logic.language}
-      location={logic.location}
-      year={year}
-      onLanguageChange={setLanguage}
-      onLocationChange={setLocation}
-      onYearChange={(newYear) => handleNavigate(url, newYear)}
       onSharePage={handleSharePage}
-      showDebugMenu={showDebugMenu}
-      debugProxySessions={debugProxySessions}
-      debugForceHeadless={debugForceHeadless}
-      debugVerboseLogging={debugVerboseLogging}
-      onToggleProxySessions={setDebugProxySessions}
-      onToggleForceHeadless={setDebugForceHeadless}
-      onToggleVerboseLogging={setDebugVerboseLogging}
       skipInitialSound={skipInitialSound}
       instanceId={instanceId}
       onNavigateNext={onNavigateNext}
@@ -201,7 +151,6 @@ export function InternetExplorerAppComponent({
           itemType={t("apps.internet-explorer.page")}
           itemTypeKey="page"
           itemIdentifier={url}
-          secondaryIdentifier={year}
           title={currentPageTitle || url}
           generateShareUrl={ieGenerateShareUrl}
         />
@@ -216,9 +165,6 @@ export function InternetExplorerAppComponent({
               historyIndex={historyIndex}
               historyLength={history.length}
               url={url}
-              year={year}
-              pastYears={pastYears}
-              futureYears={futureYears}
               favorites={favorites}
               hasMoreToScroll={hasMoreToScroll}
               urlInputRef={urlInputRef}
@@ -228,8 +174,6 @@ export function InternetExplorerAppComponent({
               filteredSuggestions={filteredSuggestions}
               selectedSuggestionIndex={selectedSuggestionIndex}
               dropdownStyle={dropdownStyle}
-              cachedYears={cachedYears}
-              isFetchingCachedYears={isFetchingCachedYears}
               isSelectingText={isSelectingText}
               t={t}
               setLocalUrl={setLocalUrl}
@@ -237,7 +181,6 @@ export function InternetExplorerAppComponent({
               setIsUrlDropdownOpen={setIsUrlDropdownOpen}
               setIsSelectingText={setIsSelectingText}
               setSelectedSuggestionIndex={setSelectedSuggestionIndex}
-              setTimeMachineViewOpen={setTimeMachineViewOpen}
               stripProtocol={stripProtocol}
               isValidUrl={isValidUrl}
               normalizeUrlInline={normalizeUrlInline}
@@ -251,26 +194,14 @@ export function InternetExplorerAppComponent({
             />
 
             <InternetExplorerContentPane
-              errorDetails={errorDetails}
-              url={url}
-              year={year}
-              mode={mode}
+              errorMessage={errorMessage}
               finalUrl={finalUrl}
-              isFutureYear={isFutureYear}
-              isAiLoading={isAiLoading}
-              aiGeneratedHtml={aiGeneratedHtml}
-              generatedHtml={generatedHtml}
               status={status}
-              isFetchingWebsiteContent={isFetchingWebsiteContent}
+              url={url}
               isForeground={!!isForeground}
               currentTheme={currentTheme}
               iframeRef={iframeRef}
-              loadingBarVariants={loadingBarVariants}
               t={t}
-              playElevatorMusic={playElevatorMusic}
-              stopElevatorMusic={stopElevatorMusic}
-              playDingSound={playDingSound}
-              getDebugStatusMessage={getDebugStatusMessage}
               handleGoBack={handleGoBack}
               handleNavigate={handleNavigate}
               handleIframeLoad={handleIframeLoad}
@@ -288,25 +219,16 @@ export function InternetExplorerAppComponent({
             isAboutDialogOpen={isAboutDialogOpen}
             isClearFavoritesDialogOpen={isClearFavoritesDialogOpen}
             isClearHistoryDialogOpen={isClearHistoryDialogOpen}
-            isResetFavoritesDialogOpen={isResetFavoritesDialogOpen}
-            isFutureSettingsDialogOpen={isFutureSettingsDialogOpen}
-            isTimeMachineViewOpen={isTimeMachineViewOpen}
             translatedHelpItems={translatedHelpItems}
             url={url}
-            year={year}
-            chronologicallySortedYears={chronologicallySortedYears}
             setTitleDialogOpen={setTitleDialogOpen}
             setNewFavoriteTitle={setNewFavoriteTitle}
             setHelpDialogOpen={setHelpDialogOpen}
             setAboutDialogOpen={setAboutDialogOpen}
             setClearFavoritesDialogOpen={setClearFavoritesDialogOpen}
             setClearHistoryDialogOpen={setClearHistoryDialogOpen}
-            setResetFavoritesDialogOpen={setResetFavoritesDialogOpen}
-            setFutureSettingsDialogOpen={setFutureSettingsDialogOpen}
-            setTimeMachineViewOpen={setTimeMachineViewOpen}
             handleTitleSubmit={handleTitleSubmit}
             handleClearFavorites={handleClearFavorites}
-            handleResetFavorites={handleResetFavorites}
             clearHistory={clearHistory}
             handleNavigate={handleNavigate}
           />

@@ -5,7 +5,6 @@ import { IeMenuBarFileMenu } from "./IeMenuBarFileMenu";
 import { IeMenuBarEditMenu } from "./IeMenuBarEditMenu";
 import { IeMenuBarFavoritesMenu } from "./IeMenuBarFavoritesMenu";
 import { IeMenuBarHistoryMenu } from "./IeMenuBarHistoryMenu";
-import { IeMenuBarDebugMenu } from "./IeMenuBarDebugMenu";
 
 export function InternetExplorerMenuBar(props: InternetExplorerMenuBarProps) {
   const vm = useInternetExplorerMenuBar(props);
@@ -27,7 +26,6 @@ export function InternetExplorerMenuBar(props: InternetExplorerMenuBarProps) {
       <IeMenuBarEditMenu vm={vm} />
       <IeMenuBarFavoritesMenu vm={vm} />
       <IeMenuBarHistoryMenu vm={vm} />
-      {vm.showDebugMenu && <IeMenuBarDebugMenu vm={vm} />}
     </AppMenuBarShell>
   );
 }

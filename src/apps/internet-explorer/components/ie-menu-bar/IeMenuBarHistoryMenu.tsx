@@ -62,9 +62,7 @@ export function IeMenuBarHistoryMenu({
             {history.slice(0, 10).map((entry) => (
               <MenubarItem
                 key={entry.url + entry.timestamp}
-                onClick={() =>
-                  onNavigateToHistory?.(entry.url, entry.year || "current")
-                }
+                onClick={() => onNavigateToHistory?.(entry.url)}
                 className="text-md h-6 px-3 flex items-center gap-2"
               >
                 {entry.favicon &&
@@ -86,14 +84,7 @@ export function IeMenuBarHistoryMenu({
                     className="size-4 [image-rendering:pixelated]"
                   />
                 )}
-                <span className="truncate">
-                  {entry.title}
-                  {entry.year && entry.year !== "current" && (
-                    <span className="text-xs text-neutral-500 ml-1">
-                      ({entry.year})
-                    </span>
-                  )}
-                </span>
+                <span className="truncate">{entry.title}</span>
               </MenubarItem>
             ))}
             <MenubarSeparator className="h-[2px] bg-black my-1" />

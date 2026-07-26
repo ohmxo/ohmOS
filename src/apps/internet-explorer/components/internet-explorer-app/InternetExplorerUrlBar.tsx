@@ -1,12 +1,6 @@
 import type { CSSProperties, RefObject } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ClockCounterClockwise, MagnifyingGlass } from "@phosphor-icons/react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { ThemedIcon } from "@/components/shared/ThemedIcon";
 import { checkOfflineAndShowError } from "@/utils/offline";
 import type { InternetExplorerSuggestionItem } from "./types";
@@ -23,8 +17,6 @@ export interface InternetExplorerUrlBarProps {
   filteredSuggestions: InternetExplorerSuggestionItem[];
   selectedSuggestionIndex: number;
   dropdownStyle: CSSProperties;
-  cachedYears: string[];
-  isFetchingCachedYears: boolean;
   isSelectingText: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
   setLocalUrl: (value: string) => void;
@@ -32,7 +24,6 @@ export interface InternetExplorerUrlBarProps {
   setIsUrlDropdownOpen: (open: boolean) => void;
   setIsSelectingText: (selecting: boolean) => void;
   setSelectedSuggestionIndex: (index: number) => void;
-  setTimeMachineViewOpen: (open: boolean) => void;
   stripProtocol: (value: string) => string;
   isValidUrl: (value: string) => boolean;
   normalizeUrlInline: (value: string) => string;
@@ -52,8 +43,6 @@ export function InternetExplorerUrlBar({
   filteredSuggestions,
   selectedSuggestionIndex,
   dropdownStyle,
-  cachedYears,
-  isFetchingCachedYears,
   isSelectingText,
   t,
   setLocalUrl,
@@ -61,7 +50,6 @@ export function InternetExplorerUrlBar({
   setIsUrlDropdownOpen,
   setIsSelectingText,
   setSelectedSuggestionIndex,
-  setTimeMachineViewOpen,
   stripProtocol,
   isValidUrl,
   normalizeUrlInline,
@@ -297,44 +285,6 @@ export function InternetExplorerUrlBar({
             })()}
           </div>
         )}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTimeMachineViewOpen(true)}
-            disabled={isFetchingCachedYears || cachedYears.length <= 1}
-            className={`size-7 absolute right-1 top-1/2 -translate-y-1/2 focus-visible:ring-0 focus-visible:ring-offset-0 ${
-              cachedYears.length > 1 ? "" : "opacity-50 cursor-not-allowed"
-            }`}
-            aria-label={t("apps.internet-explorer.showCachedVersionsTimeMachine")}
-            style={{
-              pointerEvents: cachedYears.length <= 1 ? "none" : "auto",
-            }}
-          >
-            <ClockCounterClockwise
-              className={`size-4 ${
-                cachedYears.length > 1
-                  ? "text-orange-500"
-                  : "text-neutral-400"
-              }`}
-              weight="bold"
-            />
-          </Button>
-        </TooltipTrigger>
-        {cachedYears.length > 1 && (
-          <TooltipContent side="bottom">
-            <p>
-              {t(
-                cachedYears.length === 1
-                  ? "apps.internet-explorer.timeNodes"
-                  : "apps.internet-explorer.timeNodes_plural",
-                { count: cachedYears.length }
-              )}
-            </p>
-          </TooltipContent>
-        )}
-      </Tooltip>
     </div>
   );
 }

@@ -1,13 +1,6 @@
 import type { CSSProperties, RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -25,9 +18,6 @@ export interface InternetExplorerToolbarProps {
   historyIndex: number;
   historyLength: number;
   url: string;
-  year: string;
-  pastYears: string[];
-  futureYears: string[];
   favorites: Favorite[];
   hasMoreToScroll: boolean;
   urlInputRef: RefObject<HTMLInputElement | null>;
@@ -37,8 +27,6 @@ export interface InternetExplorerToolbarProps {
   filteredSuggestions: InternetExplorerSuggestionItem[];
   selectedSuggestionIndex: number;
   dropdownStyle: CSSProperties;
-  cachedYears: string[];
-  isFetchingCachedYears: boolean;
   isSelectingText: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
   setLocalUrl: (value: string) => void;
@@ -46,11 +34,10 @@ export interface InternetExplorerToolbarProps {
   setIsUrlDropdownOpen: (open: boolean) => void;
   setIsSelectingText: (selecting: boolean) => void;
   setSelectedSuggestionIndex: (index: number) => void;
-  setTimeMachineViewOpen: (open: boolean) => void;
   stripProtocol: (value: string) => string;
   isValidUrl: (value: string) => boolean;
   normalizeUrlInline: (value: string) => string;
-  normalizeUrlForHistory: (url: string) => string;
+  normalizeUrlForHistory: (value: string) => string;
   handleFilterSuggestions: (value: string) => void;
   handleNavigate: (navUrl: string, navYear?: string) => void;
   handleNavigateWithHistory: (navUrl: string, navYear?: string) => void;
@@ -66,9 +53,6 @@ export function InternetExplorerToolbar({
   historyIndex,
   historyLength,
   url,
-  year,
-  pastYears,
-  futureYears,
   favorites,
   hasMoreToScroll,
   urlInputRef,
@@ -78,8 +62,6 @@ export function InternetExplorerToolbar({
   filteredSuggestions,
   selectedSuggestionIndex,
   dropdownStyle,
-  cachedYears,
-  isFetchingCachedYears,
   isSelectingText,
   t,
   setLocalUrl,
@@ -87,7 +69,6 @@ export function InternetExplorerToolbar({
   setIsUrlDropdownOpen,
   setIsSelectingText,
   setSelectedSuggestionIndex,
-  setTimeMachineViewOpen,
   stripProtocol,
   isValidUrl,
   normalizeUrlInline,
@@ -165,8 +146,6 @@ export function InternetExplorerToolbar({
           filteredSuggestions={filteredSuggestions}
           selectedSuggestionIndex={selectedSuggestionIndex}
           dropdownStyle={dropdownStyle}
-          cachedYears={cachedYears}
-          isFetchingCachedYears={isFetchingCachedYears}
           isSelectingText={isSelectingText}
           t={t}
           setLocalUrl={setLocalUrl}
@@ -174,7 +153,6 @@ export function InternetExplorerToolbar({
           setIsUrlDropdownOpen={setIsUrlDropdownOpen}
           setIsSelectingText={setIsSelectingText}
           setSelectedSuggestionIndex={setSelectedSuggestionIndex}
-          setTimeMachineViewOpen={setTimeMachineViewOpen}
           stripProtocol={stripProtocol}
           isValidUrl={isValidUrl}
           normalizeUrlInline={normalizeUrlInline}
@@ -182,51 +160,6 @@ export function InternetExplorerToolbar({
           handleNavigate={handleNavigate}
           handleNavigateWithHistory={handleNavigateWithHistory}
         />
-        <div className="flex items-center gap-2">
-          {year !== "current" && (
-            <Select value={year} onValueChange={(newYear) => handleNavigate(url, newYear)}>
-              <SelectTrigger
-                className={
-                  isWindowsTheme
-                    ? "!text-[11px]"
-                    : currentTheme === "macosx"
-                      ? "!text-[12px]"
-                      : "!text-[16px]"
-                }
-              >
-                <SelectValue placeholder={t("apps.internet-explorer.year")} />
-              </SelectTrigger>
-              <SelectContent className="px-0">
-                {futureYears.map((y) => (
-                  <SelectItem
-                    key={y}
-                    value={y}
-                    className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text text-os-link"
-                  >
-                    {y}
-                  </SelectItem>
-                ))}
-                <SelectItem
-                  value="current"
-                  className="text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text"
-                >
-                  {t("apps.internet-explorer.now")}
-                </SelectItem>
-                {pastYears.map((y) => (
-                  <SelectItem
-                    key={y}
-                    value={y}
-                    className={`text-md h-6 px-3 active:bg-os-selection-bg active:text-os-selection-text ${
-                      parseInt(y) <= 1995 ? "text-os-link" : ""
-                  }`}
-                >
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          )}
-        </div>
       </div>
       <InternetExplorerFavoritesBar
         favorites={favorites}
