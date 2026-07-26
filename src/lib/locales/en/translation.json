@@ -690,7 +690,6 @@
       "search": "Search",
       "enterUrlOrSearch": "Search the web or enter a URL",
       "searchOpensInNewTab": "Results open in a new tab",
-      "showCachedVersionsTimeMachine": "Show cached versions (Time Machine)",
       "timeNodes": "{{count}} Time Node",
       "timeNodes_plural": "{{count}} Time Nodes",
       "year": "Year",
@@ -712,7 +711,6 @@
       "off": "Off",
       "oldest": "Oldest",
       "newest": "Newest",
-      "closeTimeMachine": "Close Time Machine",
       "loadingEllipsis": "Loading…",
       "errorLoadingPreview": "Error loading preview.",
       "unableToLoadPreview": "Unable to load preview.",
@@ -727,7 +725,6 @@
       "menu": {
         "goToUrl": "Go to URL",
         "sharePage": "Share Page…",
-        "openTimeMachine": "Open Time Machine",
         "refresh": "Refresh",
         "stop": "Stop",
         "year": "Year",

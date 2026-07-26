@@ -1,64 +1,55 @@
 # TASK.md — Session Handoff
 
-> **Date:** 2026-07-25
-> **Session focus:** Docs migration, .codex setup, AGPL footer wire-up, tsconfig fix
-> **Next session:** Decide which app to tackle next — or restore IE backend proxy
+> **Date:** 2026-07-26
+> **Session focus:** Internet Explorer wiring finalization + IDE diagnostic sweep
+> **Next session:** Pick the next app polish item from `docs/superpowers/specs/`, or revisit IE live-loading UX
 
 ---
 
 ## What Was Done
 
-### AGPL-3.0 Compliance Footer
-- `src/components/layout/AgplFooter.tsx` — new fixed-bottom footer with source link
-- Wired in `src/App.tsx` alongside ScreenSaverOverlay
-- Repo URL corrected from `ohmxo/ryos` to `ohmxo/ohmOS`
+### Internet Explorer — Final Wiring (`89dcdc68d`)
 
-### .codex/ Setup
-- `.codex/` folder initialized with project-specific hooks, agents, and config
+The IE app was simplified to **start page + iframe-based browsing** in prior sessions, but a small number of stale references to the time-travel machinery remained. Resolved all of them.
 
-### Docs Migration
-- 443 instances of "ryOS" renamed to "ohmOS" across 63 markdown files in `docs/`
-- `api/tsconfig.json` — added `ignoreDeprecations: "6.0"` for TypeScript 7.0 compat
-- `.env.example` committed
+- `useInternetExplorerLogic.ts` — dropped unused `log` import and `isNavigatingHistory` destructure; exposed `normalizeUrlForHistory` as an alias of `normalizeUrlInline` for the favorites bar pass-through
+- `InternetExplorerAppComponent.tsx` — added `normalizeUrlForHistory` to destructure + forward, dropped unused `errorDetails`
+- `InternetExplorerToolbar.tsx` — added `normalizeUrlForHistory` to the props interface + destructure so it forwards to `InternetExplorerFavoritesBar`
+- Verified: `handleNavigate` still routes through `/api/iframe-check?mode=proxy&url=<encoded>&theme=<theme>` with `sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-pointer-lock"`
 
-### Previous Work
+### IDE Diagnostic Sweep (`a2da18339` + this session)
 
-#### Phase 1.5 — Branding Cleanup (Complete ✅)
-- All user-facing "ryOS" → "OHMXO" in i18n files, About dialogs, boot screen, error screens
-- Default contact replaced (Ryo Lu → Jacob Adeshiyan)
-- IE bookmarks replaced (ryo.lu → ohmxo.com, Cursor → GitHub)
-- Cursor brand assets deleted, OHMXO brand mark SVGs added
+Reduced the IDE "Problems" panel from **54 items → 0** (modulo stale caches for files deleted in git):
 
-#### Internet Explorer — Simplified
-IE was reworked from a complex proxy + AI system to a local UI-only experience:
+- **25 × `useLiteralKeys` in `appRegistry.tsx`** — converted `["app-name"]: { ... }` to `"app-name": { ... }` via `sed` (one regex, no per-line edits)
+- **28 × `suggestCanonicalClasses` across 8 files** — bulk-applied Tailwind v4 canonical class names (`h-[2px]`→`h-0.5`, `max-h-[400px]`→`max-h-100`, `min-w-[12rem]`→`min-w-48`, `!text-[Npx]`→`text-[Npx]!`, `w-[180px]`→`w-45`, `h-[26px]`→`h-6.5`, `mt-[2px]`→`mt-0.5`, `z-[45]`→`z-45`, `!overflow-y-auto`→`overflow-y-auto!`, `break-words`→`wrap-break-word`, `border-[color:var(...)]`→`border-(...)` and the matching `border-[length:...]` form)
+- **2 × non-null assertions in `appRegistry.tsx`** — replaced `minesweeperMetadata!.icon` and `terminalMetadata!.icon` with `?.icon ?? ""`
+- **1 × `useTemplate` in `urlHelpers.ts`** — converted `"..."` suffix concat to a template literal
+- **3 × `organizeImports` warnings** — auto-fixed by biome during the earlier run
+- **33 × dead i18n keys in 11 locales** — removed `closeTimeMachine`, `openTimeMachine`, `showCachedVersionsTimeMachine` (and their translations) which referenced deleted components
 
-**What works:**
-- Start page renders with search box + favorites grid
-- Search queries open DuckDuckGo in a new browser tab
-- Favorites/bookmarks open in new tab
-- URLs typed into address bar open in new tab
-- Stale localStorage state is wiped via store migration (v8)
+### Known Stale Diagnostics (not real issues)
 
-**What doesn't work (by design):**
-- Loading ANY website in the iframe — every site blocks iframing
-- Time-travel / AI generation — requires backend + AI key
-- Wayback Machine proxy — removed
+- **`api/tsconfig.json:12`** — IDE still reports `baseUrl` deprecation but the file already has `"ignoreDeprecations": "6.0"`. IDE cache lag; will clear on reload.
+- **`IeMenuBarYearSubmenu.tsx`, `IeMenuBarLocationSubmenu.tsx`, `FutureSettingsDialog.tsx`** — IDE shows Tailwind warnings for files that are deleted (staged in the prior commit). They vanish on commit.
+- **`useAiGeneration.ts`, `time-machine-view/*`, etc.** — IDE shows these in the file tree (they're deleted in git). Cosmetic.
 
-### Latest Commits
+## Verification
+
+- `bun run typecheck` → **exit 0, no errors**
+- `bun run build` → **227 precache entries, build succeeded**
+- IE spec compliance (verified by direct file inspection):
+  - Proxy URL routing intact
+  - Sandbox attribute intact
+  - Favorites, history, share, help, dialogs all wired
+  - No time-travel stragglers in source code
+
+## Latest Commits
+
 ```
-6da55c770 fix: wire AGPL footer into app shell and correct repo URL
-7b0d69a48 chore: rename repo to ohmOS
-cf0b4d8ec docs: comprehensive project documentation update
-16dba48d8 fix(ie): remove search engines from passthrough list
-303aa40ec fix(ie): open non-passthrough URLs in new tab
-38fbc0c63 fix(ie): silence fetchCachedYears and remove orphaned code
-e39a2ca30 chore(ie): remove dead code from navigation cleanup
-e7d9d9c8b fix(ie): bump store to v8 so migrate clears stale state
-9edc8e2fa fix(ie): add store migration to reset stale state on version bump
-4416eafda fix(ie): search now opens DuckDuckGo in new tab
-671fb7596 fix(ie): rewrite as local start page + new tab browser
-88895db0a feat(branding): Phase 1.5 branding cleanup
-79e6e0432 docs: add PROJECT_STATUS.md
+a2da18339 style: silence tailwind/biome IDE warnings (canonical classes + non-null + template)
+89dcdc68d fix(ie): finalize iframe proxy wiring, drop time-travel remnants
+c11b91843 feat(ie): rewrite proxy — strip time-travel/Wayback/AI bloat, 1721 lines removed
 ```
 
 ## TypeScript: Clean ✅
@@ -66,14 +57,8 @@ e7d9d9c8b fix(ie): bump store to v8 so migrate clears stale state
 
 ## Technical Debt / Known Issues
 
-### Internet Explorer — Fundamental Limitation
-IE cannot display web pages in an iframe. No major website allows iframing. The app is now a functional **start page + link launcher** that opens everything in new tabs.
-
-### IDE Diagnostics (non-blocking)
-- `api/tsconfig.json` — `baseUrl` deprecated in TS 7.0 (suppressed with `ignoreDeprecations: "6.0"`)
-- Tailwind CSS v4 canonical class suggestions (minor, style-only)
-- Biome lint warnings in `appRegistry.tsx` (useLiteralKeys suggestions)
-- `DebugLogOverlay.tsx` — 2 non-null assertions flagged by Biome
+### Internet Explorer — Sandbox Limitation
+The iframe sandbox (`allow-scripts allow-forms allow-same-origin allow-popups allow-pointer-lock`) lets most sites load via the `/api/iframe-check` proxy. Sites that send `X-Frame-Options: DENY` or strict CSP `frame-ancestors` still won't load — that's a platform-level limit, not something the app can fix.
 
 ### Pending Brand Assets
 From `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`:
@@ -85,6 +70,10 @@ From `docs/superpowers/specs/2026-07-24-brand-asset-requirements.md`:
 6. Default wallpaper/direction
 7. AI assistant name/personality
 
+### Untracked Files (not committed)
+- `.codex/agents/`, `.codex/prompts/`, `.codex/skills/` — local Codex config, not source
+- `fix1.py`, `tmp_store_fix.py` — throwaway scripts from earlier debugging; safe to delete
+
 ## Project State
 
 All work on `main` branch, pushed to `origin` (ohmxo/ohmOS).
@@ -93,3 +82,11 @@ All work on `main` branch, pushed to `origin` (ohmxo/ohmOS).
 origin → https://github.com/ohmxo/ohmOS.git
 upstream → https://github.com/ryokun6/ryos.git
 ```
+
+## Next Session Suggestions
+
+1. **Polish the IE start page** — verify the search experience, check the favorites directory flow, make sure help/about dialogs look good in the macOS theme
+2. **Add a `useInternetExplorer.ts` test** for the new `navigateToUrl` action and history semantics
+3. **Clean up the untracked files** in repo root (`fix1.py`, `tmp_store_fix.py`)
+4. **Move on to the next app** — see `docs/superpowers/specs/` for the queue
+5. **Drop the `appRegistryData.ts` indirection** if the killed agent left a half-done split (verify by reading the file)

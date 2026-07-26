@@ -433,7 +433,7 @@ export const appRegistry = {
 	} as BaseApp<InternetExplorerInitialData> & {
 		windowConfig: WindowConstraints;
 	},
-	["chats"]: {
+	"chats": {
 		id: "chats",
 		name: "Chats",
 		icon: { type: "image", src: chatsMetadata.icon },
@@ -447,7 +447,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 320 },
 		} as WindowConstraints,
 	},
-	["textedit"]: {
+	"textedit": {
 		id: "textedit",
 		name: "TextEdit",
 		icon: { type: "image", src: texteditMetadata.icon },
@@ -460,7 +460,7 @@ export const appRegistry = {
 			minSize: { width: 430, height: 200 },
 		} as WindowConstraints,
 	},
-	["preview"]: {
+	"preview": {
 		id: "preview",
 		name: "Preview",
 		icon: { type: "image", src: previewMetadata.icon },
@@ -473,7 +473,7 @@ export const appRegistry = {
 			minSize: { width: 420, height: 320 },
 		} as WindowConstraints,
 	} as BaseApp<PreviewInitialData> & { windowConfig: WindowConstraints },
-	["paint"]: {
+	"paint": {
 		id: "paint",
 		name: "Paint",
 		icon: { type: "image", src: paintMetadata.icon },
@@ -487,7 +487,7 @@ export const appRegistry = {
 			maxSize: { width: 713, height: 535 },
 		} as WindowConstraints,
 	} as BaseApp<PaintInitialData> & { windowConfig: WindowConstraints },
-	["photo-booth"]: {
+	"photo-booth": {
 		id: "photo-booth",
 		name: "Photo Booth",
 		icon: { type: "image", src: photoboothMetadata.icon },
@@ -501,7 +501,7 @@ export const appRegistry = {
 			maxSize: { width: 644, height: 510 },
 		} as WindowConstraints,
 	},
-	["minesweeper"]: {
+	"minesweeper": {
 		id: "minesweeper",
 		name: "Minesweeper",
 		icon: { type: "image", src: minesweeperMetadata?.icon ?? "" },
@@ -515,7 +515,7 @@ export const appRegistry = {
 			maxSize: { width: 305, height: 400 },
 		} as WindowConstraints,
 	},
-	["videos"]: {
+	"videos": {
 		id: "videos",
 		name: "Videos",
 		icon: { type: "image", src: videosMetadata.icon },
@@ -528,7 +528,7 @@ export const appRegistry = {
 			minSize: { width: 400, height: 340 },
 		} as WindowConstraints,
 	} as BaseApp<VideosInitialData> & { windowConfig: WindowConstraints },
-	["tv"]: {
+	"tv": {
 		id: "tv",
 		name: "TV",
 		icon: { type: "image", src: tvMetadata.icon },
@@ -541,7 +541,7 @@ export const appRegistry = {
 			minSize: { width: 320, height: 360 },
 		} as WindowConstraints,
 	} as BaseApp<unknown> & { windowConfig: WindowConstraints },
-	["ipod"]: {
+	"ipod": {
 		id: "ipod",
 		name: "iPod",
 		icon: { type: "image", src: ipodMetadata.icon },
@@ -554,7 +554,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 480 },
 		} as WindowConstraints,
 	} as BaseApp<IpodInitialData> & { windowConfig: WindowConstraints },
-	["karaoke"]: {
+	"karaoke": {
 		id: "karaoke",
 		name: "Karaoke",
 		icon: { type: "image", src: karaokeMetadata.icon },
@@ -568,7 +568,7 @@ export const appRegistry = {
 			mobileSquare: true,
 		} as WindowConstraints,
 	} as BaseApp<IpodInitialData> & { windowConfig: WindowConstraints },
-	["synth"]: {
+	"synth": {
 		id: "synth",
 		name: "Synth",
 		icon: { type: "image", src: synthMetadata.icon },
@@ -581,7 +581,7 @@ export const appRegistry = {
 			minSize: { width: 720, height: 290 },
 		} as WindowConstraints,
 	},
-	["terminal"]: {
+	"terminal": {
 		id: "terminal",
 		name: "Terminal",
 		icon: { type: "image", src: terminalMetadata?.icon ?? "" },
@@ -594,7 +594,7 @@ export const appRegistry = {
 			minSize: { width: 400, height: 300 },
 		} as WindowConstraints,
 	},
-	["applet-viewer"]: {
+	"applet-viewer": {
 		id: "applet-viewer",
 		name: "Applet Store",
 		icon: { type: "image", src: appletViewerMetadata.icon },
@@ -607,7 +607,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 200 },
 		} as WindowConstraints,
 	} as BaseApp<AppletViewerInitialData> & { windowConfig: WindowConstraints },
-	["control-panels"]: {
+	"control-panels": {
 		id: "control-panels",
 		name: "Control Panels",
 		icon: { type: "image", src: controlPanelsMetadata.icon },
@@ -621,7 +621,7 @@ export const appRegistry = {
 			maxSize: { width: 560, height: 600 },
 		} as WindowConstraints,
 	} as BaseApp<ControlPanelsInitialData> & { windowConfig: WindowConstraints },
-	["admin"]: {
+	"admin": {
 		id: "admin",
 		name: "Admin",
 		icon: { type: "image", src: adminMetadata.icon },
@@ -635,7 +635,7 @@ export const appRegistry = {
 			minSize: { width: 600, height: 400 },
 		} as WindowConstraints,
 	},
-	["stickies"]: {
+	"stickies": {
 		id: "stickies",
 		name: "Stickies",
 		icon: { type: "image", src: stickiesMetadata.icon },
@@ -648,7 +648,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 250 },
 		} as WindowConstraints,
 	},
-	["infinite-mac"]: {
+	"infinite-mac": {
 		id: "infinite-mac",
 		name: "Infinite Mac",
 		icon: { type: "image", src: infiniteMacMetadata.icon },
@@ -662,7 +662,7 @@ export const appRegistry = {
 			maxSize: { width: 1024, height: 792 }, // 768 + 24 for macOS X titlebar spacer
 		} as WindowConstraints,
 	},
-	["pc"]: {
+	"pc": {
 		id: "pc",
 		name: "Virtual PC",
 		icon: { type: "image", src: infinitePcMetadata.icon },
@@ -676,7 +676,7 @@ export const appRegistry = {
 			maxSize: { width: 1280, height: 1024 },
 		} as WindowConstraints,
 	},
-	["winamp"]: {
+	"winamp": {
 		id: "winamp",
 		name: "Winamp",
 		icon: { type: "image", src: winampMetadata.icon },
@@ -689,7 +689,7 @@ export const appRegistry = {
 			minSize: { width: 275, height: 116 },
 		} as WindowConstraints,
 	},
-	["calendar"]: {
+	"calendar": {
 		id: "calendar",
 		name: "Calendar",
 		icon: { type: "image", src: calendarMetadata.icon },
@@ -702,7 +702,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 380 },
 		} as WindowConstraints,
 	},
-	["contacts"]: {
+	"contacts": {
 		id: "contacts",
 		name: "Contacts",
 		icon: { type: "image", src: contactsMetadata.icon },
@@ -715,7 +715,7 @@ export const appRegistry = {
 			minSize: { width: 360, height: 420 },
 		} as WindowConstraints,
 	},
-	["dashboard"]: {
+	"dashboard": {
 		id: "dashboard",
 		name: "Dashboard",
 		icon: { type: "image", src: dashboardMetadata.icon },
@@ -728,7 +728,7 @@ export const appRegistry = {
 			minSize: { width: 300, height: 250 },
 		} as WindowConstraints,
 	},
-	["maps"]: {
+	"maps": {
 		id: "maps",
 		name: "Maps",
 		icon: { type: "image", src: mapsMetadata.icon },
@@ -741,7 +741,7 @@ export const appRegistry = {
 			minSize: { width: 400, height: 300 },
 		} as WindowConstraints,
 	},
-	["books"]: {
+	"books": {
 		id: "books",
 		name: "Books",
 		icon: { type: "image", src: booksMetadata.icon },
@@ -754,7 +754,7 @@ export const appRegistry = {
 			minSize: { width: 420, height: 360 },
 		} as WindowConstraints,
 	} as BaseApp<BooksInitialData> & { windowConfig: WindowConstraints },
-	["calculator"]: {
+	"calculator": {
 		id: "calculator",
 		name: "Calculator",
 		icon: { type: "image", src: calculatorMetadata.icon },
