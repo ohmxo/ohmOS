@@ -1,36 +1,21 @@
-# Don't deploy personal files at the repo root
+# Don't deploy personal/throwaway files at the repo root
 /ohmxo/
 /fix1.py
 /tmp_store_fix.py
 
-# Don't deploy source (Vercel will rebuild from this)
-/src/
-/api/
-/scripts/
-
-# Don't deploy dev artifacts
+# Don't deploy dev artifacts (these don't need to be uploaded to Vercel
+# after the build, but the SOURCE files in src/, api/, and scripts/
+# ARE required at build time — Vercel will rebuild from them).
 /node_modules/
 /bun.lock
 /bun.lockb
 /bunfig.toml
 /components.json
 /eslint.config.js
-
-# Don't deploy git/CI configs
-/.git/
-/.github/
-/.gitignore
-
-# Don't deploy agent / editor / dev configs
 /.codex/
 /.codex/hooks.json
 /.aider*
 /.continue*
 /.cursor*
 /.windsurf*
-
-# Don't deploy Docker stuff (this deploys via Vercel, not Coolify)
-/Dockerfile
-/docker-compose.yml
-/Dockerfile*
 /.dockerignore
