@@ -32,13 +32,13 @@ export function IeMenuBarFavoritesMenu({
         <MenubarItem onClick={onHome} className="text-md h-6 px-3">
           {t("apps.internet-explorer.menu.goHome")}
         </MenubarItem>
-        <MenubarSeparator className="h-[2px] bg-black my-1" />
+        <MenubarSeparator className="h-0.5 bg-black my-1" />
         <MenubarItem onClick={onAddFavorite} className="text-md h-6 px-3">
           {t("apps.internet-explorer.menu.addToFavorites")}
         </MenubarItem>
         {favorites.length > 0 && (
           <>
-            <MenubarSeparator className="h-[2px] bg-black my-1" />
+            <MenubarSeparator className="h-0.5 bg-black my-1" />
             {favorites.map((favorite) =>
               renderFavoriteItem(
                 favorite,
@@ -46,7 +46,7 @@ export function IeMenuBarFavoritesMenu({
                 t("apps.internet-explorer.menu.folder")
               )
             )}
-            <MenubarSeparator className="h-[2px] bg-black my-1" />
+            <MenubarSeparator className="h-0.5 bg-black my-1" />
             <MenubarItem onClick={onClearFavorites} className="text-md h-6 px-3">
               {t("apps.internet-explorer.menu.clearFavorites")}
             </MenubarItem>

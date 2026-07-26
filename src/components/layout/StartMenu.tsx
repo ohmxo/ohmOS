@@ -134,7 +134,7 @@ export function StartMenu({ apps }: StartMenuProps) {
             {/* Left Panel with rotated text */}
             {(isWindowsTheme) && (
               <div
-                className="relative w-[32px] overflow-hidden"
+                className="relative w-8 overflow-hidden"
                 style={{
                   background:
                     isWinXp

@@ -32,7 +32,7 @@ export function IeMenuBarHistoryMenu({
       <MenubarContent
         align="start"
         sideOffset={1}
-        className="px-0 max-h-[400px] overflow-y-auto max-w-xs"
+        className="px-0 max-h-100 overflow-y-auto max-w-xs"
       >
         <MenubarItem
           onClick={onGoBack}
@@ -58,7 +58,7 @@ export function IeMenuBarHistoryMenu({
         </MenubarItem>
         {history.length > 0 && (
           <>
-            <MenubarSeparator className="h-[2px] bg-black my-1" />
+            <MenubarSeparator className="h-0.5 bg-black my-1" />
             {history.slice(0, 10).map((entry) => (
               <MenubarItem
                 key={entry.url + entry.timestamp}
@@ -87,7 +87,7 @@ export function IeMenuBarHistoryMenu({
                 <span className="truncate">{entry.title}</span>
               </MenubarItem>
             ))}
-            <MenubarSeparator className="h-[2px] bg-black my-1" />
+            <MenubarSeparator className="h-0.5 bg-black my-1" />
             <MenubarItem onClick={onClearHistory} className="text-md h-6 px-3">
               {t("apps.internet-explorer.menu.clearHistory")}
             </MenubarItem>

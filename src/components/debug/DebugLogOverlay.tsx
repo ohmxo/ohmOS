@@ -100,7 +100,7 @@ type DebugPanelTab = "logs" | "live" | "network" | "idb";
 // the selected pill in dark mode.
 const quickFilterPillClassName = cn(
   "flex h-5 items-center gap-1 rounded-full border px-1.5 font-os-ui text-[10px] leading-none",
-  "border-[color:var(--os-color-separator)] text-os-text-secondary",
+  "border-(--os-color-separator) text-os-text-secondary",
   "data-[state=off]:bg-black/5 data-[state=off]:hover:bg-black/10",
   "os-mac-aqua-dark:data-[state=off]:bg-white/5 os-mac-aqua-dark:data-[state=off]:hover:bg-white/10",
   "data-[state=on]:border-transparent data-[state=on]:bg-os-selection-bg data-[state=on]:text-os-selection-text",
@@ -275,7 +275,7 @@ function ConsoleEntryContent({
             data-debug-json-content
             className={cn(
               "my-0.5 max-w-full overflow-x-auto border-l pl-2",
-              "border-[color:var(--os-color-separator)]",
+              "border-(--os-color-separator)",
               "whitespace-pre font-os-mono text-[10px] leading-[1.45] text-inherit"
             )}
           >
@@ -806,7 +806,7 @@ export function DebugLogOverlay() {
           <div
             className={cn(
               "flex h-8 shrink-0 items-center gap-1.5 border-b px-2 py-1",
-              "border-[color:var(--os-color-separator)]",
+              "border-(--os-color-separator)",
               isMacOSTheme ? "bg-transparent" : "bg-os-panel-bg"
             )}
           >
@@ -848,7 +848,7 @@ export function DebugLogOverlay() {
                     align="start"
                     sideOffset={4}
                     container={overlayRootRef.current}
-                    className="max-h-[min(70vh,24rem)] min-w-[12rem] !overflow-y-auto overscroll-contain"
+                    className="max-h-[min(70vh,24rem)] min-w-48 overflow-y-auto! overscroll-contain"
                   >
                     <DropdownMenuRadioGroup
                       value={loggerFilter}
@@ -937,7 +937,7 @@ export function DebugLogOverlay() {
                     align="start"
                     sideOffset={4}
                     container={overlayRootRef.current}
-                    className="min-w-[12rem]"
+                    className="min-w-48"
                   >
                     <DropdownMenuRadioGroup
                       value={networkFilter}
@@ -1140,7 +1140,7 @@ export function DebugLogOverlay() {
                       </span>
                       <div
                         className={cn(
-                          "min-w-0 flex-1 whitespace-pre-wrap break-words",
+                          "min-w-0 flex-1 whitespace-pre-wrap wrap-break-word",
                           LEVEL_TEXT_CLASS[entry.level]
                         )}
                       >
@@ -1164,7 +1164,7 @@ export function DebugLogOverlay() {
                 aria-label={t("debug.scrollToBottom")}
                 className={cn(
                   "absolute bottom-2 right-3 flex items-center gap-1 rounded-full px-2 py-1",
-                  "border-[length:var(--os-metrics-border-width)] border-os-window",
+                  "border-(length:--os-metrics-border-width) border-os-window",
                   "bg-os-window-bg text-os-text-primary shadow-os-window",
                   "font-os-ui text-[11px] hover:brightness-105 active:brightness-95"
                 )}
@@ -1217,7 +1217,7 @@ export function DebugLogOverlay() {
           <div
             className={cn(
               "flex h-8 shrink-0 items-center justify-center border-t px-2 py-1",
-              "border-[color:var(--os-color-separator)]",
+              "border-(--os-color-separator)",
               isMacOSTheme ? "bg-transparent" : "bg-os-panel-bg"
             )}
           >
@@ -1289,7 +1289,7 @@ export function DebugLogOverlay() {
         aria-pressed={open}
         className={cn(
           "flex items-center gap-1.5 rounded-full px-2.5 py-1.5 shadow-os-window",
-          "border-[length:var(--os-metrics-border-width)] border-os-window",
+          "border-(length:--os-metrics-border-width) border-os-window",
           "bg-os-window-bg text-os-text-primary font-os-ui text-[11px] font-medium",
           "hover:brightness-105 active:brightness-95",
           open && "ring-1 ring-os-selection-bg"
@@ -1300,7 +1300,7 @@ export function DebugLogOverlay() {
         {(fabErrorCount > 0 || fabWarnCount > 0) && (
           <span
             className={cn(
-              "min-w-[14px] rounded-full px-1 text-center text-[9px] font-bold text-white",
+              "min-w-3.5 rounded-full px-1 text-center text-[9px] font-bold text-white",
               fabErrorCount > 0 ? "bg-red-500" : "bg-amber-500"
             )}
           >

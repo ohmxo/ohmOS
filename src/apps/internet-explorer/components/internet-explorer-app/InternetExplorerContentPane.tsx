@@ -79,7 +79,7 @@ export function InternetExplorerContentPane({
       )}
 
       {isOffline && (
-        <div className="absolute inset-0 z-[45] bg-white">
+        <div className="absolute inset-0 z-45 bg-white">
           <OfflineEmptyState appName={getTranslatedAppName("internet-explorer")} />
         </div>
       )}

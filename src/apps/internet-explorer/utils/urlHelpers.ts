@@ -18,7 +18,7 @@ export const getHostnameFromUrl = (url: string): string => {
 export const formatTitle = (title: string): string => {
   if (!title) return "Internet Explorer";
   return title.length > MAX_TITLE_LENGTH
-    ? title.substring(0, MAX_TITLE_LENGTH) + "..."
+    ? `${title.substring(0, MAX_TITLE_LENGTH)}...`
     : title;
 };
 

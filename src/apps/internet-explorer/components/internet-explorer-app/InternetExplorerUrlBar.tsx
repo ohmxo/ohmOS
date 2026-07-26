@@ -156,10 +156,10 @@ export function InternetExplorerUrlBar({
         }}
         className={`flex-1 pl-2 pr-8 ${
           isWindowsTheme
-            ? "!text-[11px]"
+            ? "text-[11px]!"
             : currentTheme === "macosx"
-              ? "!text-[12px] h-[26px]"
-              : "!text-[16px]"
+              ? "text-[12px]! h-6.5"
+              : "text-[16px]!"
         } `}
         style={
           currentTheme === "macosx"
@@ -184,7 +184,7 @@ export function InternetExplorerUrlBar({
           )) && (
           <div
             style={dropdownStyle}
-            className="absolute top-full left-0 right-0 mt-[2px] bg-white border border-neutral-300 shadow-md rounded-md z-50 max-h-48 overflow-y-auto font-geneva-12"
+            className="absolute top-full left-0 right-0 mt-0.5 bg-white border border-neutral-300 shadow-md rounded-md z-50 max-h-48 overflow-y-auto font-geneva-12"
             data-dropdown-content
           >
             {(() => {
