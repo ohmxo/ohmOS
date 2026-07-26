@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "bun run build:vite",
+  "buildCommand": "npx vite build",
   "installCommand": "bun install --ignore-scripts",
   "outputDirectory": "dist",
   "rewrites": [
