@@ -781,10 +781,7 @@ export function useAiChat(onPromptSetUsername?: () => void) {
           foregroundApp: freshSystemState.runningApps.foreground?.appId ?? null,
           backgroundAppCount: freshSystemState.runningApps.background.length,
           textEditInstanceCount: freshSystemState.textEdit.instances.length,
-          hasInternetExplorerMarkdown: Boolean(
-            freshSystemState.internetExplorer.aiGeneratedMarkdown
-          ),
-          hasIpodLyrics: Boolean(freshSystemState.ipod.currentLyrics),
+                    hasIpodLyrics: Boolean(freshSystemState.ipod.currentLyrics),
         },
       });
 

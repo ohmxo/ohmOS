@@ -19,7 +19,7 @@ const MAX_REDIRECTS = 5;
 
 export default apiHandler(
   {
-    methods: ["GET"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
     contentType: null,
     allowMissingOrigin: true,
   },
@@ -57,7 +57,12 @@ export default apiHandler(
     }
 
     const isRawProxy = req.query.raw === "1" || req.query.raw === "true";
-    const proxyBase = getAppPublicOrigin(origin);
+    // Use the browser-facing origin (from the apiHandler, which resolves the
+    // Origin/Referer header) so rewritten resource URLs point back to the
+    // same host the browser sees — not the API server's internal port.
+    // In dev this is http://localhost:5173 (Vite proxies /api/* to port 3000);
+    // in production it's the deployed origin.
+    const proxyBase = origin || getAppPublicOrigin(null);
     const upstreamOrigin = parsedUrl.origin;
 
     // Fetch the upstream page

@@ -34,7 +34,7 @@
 | `toast.updateReady` | `"Update ready for ohmOS {{version}} ({{buildNumber}})"` | `"Update ready for OHMXO {{version}} ({{buildNumber}})"` |
 | `toast.alreadyLatestVersionDetail` | `"ohmOS {{version}} ({{buildNumber}})"` | `"OHMXO {{version}} ({{buildNumber}})"` |
 | `toast.desktopAvailable` | `"ohmOS {{version}} for {{platform}} is available"` | `"OHMXO {{version}} for {{platform}} is available"` |
-| `toast.desktopAppOffer` | `"ohmOS is available as a {{platform}} app"` | `"OHMXO is available as a {{platform}} app"` |
+| `toast.desktopAppOffer` | `"ohmOS is available as a {{platform}} app"` |
 | `login.dialogTitle` | `"Sign In to ohmOS"` | `"Sign In"` |
 | `codePreview.title` | `"ohmOS Code Preview"` | `"Code Preview"` |
 | `codePreview.titleFullscreen` | `"ohmOS Code Preview Fullscreen"` | `"Code Preview Fullscreen"` |

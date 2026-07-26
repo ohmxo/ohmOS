@@ -184,15 +184,6 @@ export const getSystemState = () => {
     };
   });
 
-  let ieHtmlMarkdown: string | null = null;
-  if (ieStore.aiGeneratedHtml) {
-    try {
-      ieHtmlMarkdown = htmlToMarkdown(ieStore.aiGeneratedHtml);
-    } catch (err) {
-      console.error("Failed to convert IE HTML to markdown:", err);
-    }
-  }
-
   return {
     username: chatsStore.username,
     userOS: detectUserOS(),
@@ -209,9 +200,7 @@ export const getSystemState = () => {
     },
     internetExplorer: {
       url: ieStore.url,
-      year: ieStore.year,
       currentPageTitle: ieStore.currentPageTitle,
-      aiGeneratedMarkdown: ieHtmlMarkdown,
     },
     video: {
       currentVideo: currentVideo

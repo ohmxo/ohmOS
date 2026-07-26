@@ -1,5 +1,4 @@
 {
-  "description": "ohmOS project-specific OMX hooks",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -7,20 +6,20 @@
         "path": ".codex/hooks/user-prompt-submit.sh",
         "description": "Keyword detection and skill routing for ohmOS"
       }
-    ],
+    ,{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}],
     "SessionStart": [
       {
         "type": "file",
         "path": ".codex/hooks/session-start.sh",
         "description": "Session initialization for ohmOS projects"
       }
-    ],
+    ,{"matcher":"startup|resume|clear","hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}],
     "PreToolUse": [
       {
         "type": "file",
         "path": ".codex/hooks/pre-tool-use.sh",
         "description": "Guardrails for ohmOS project operations"
       }
-    ]
-  }
+    ,{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}]
+  ,"PostToolUse":[{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}],"PreCompact":[{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}],"PostCompact":[{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\""}]}],"Stop":[{"hooks":[{"type":"command","command":"\"/Users/jacob/.nvm/versions/node/v22.22.3/bin/node\" \"/Users/jacob/.nvm/versions/node/v22.22.3/lib/node_modules/oh-my-codex/dist/scripts/codex-native-hook.js\"","timeout":30}]}]}
 }
