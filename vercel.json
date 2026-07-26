@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "npx vite build",
+  "buildCommand": "mv tsconfig.json tsconfig.json.bak && cat > tsconfig.json << 'TSCEOF'\n{ \"files\": [], \"include\": [\"src\"], \"exclude\": [\"api\", \"node_modules\"] }\nTSCEOF\nnpx vite build\nEXIT=$?\nmv tsconfig.json.bak tsconfig.json\nexit $EXIT",
   "installCommand": "bun install --ignore-scripts",
   "outputDirectory": "dist",
   "rewrites": [
