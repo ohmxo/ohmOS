@@ -3,9 +3,14 @@
 /fix1.py
 /tmp_store_fix.py
 
+# Don't deploy the API directory — it's a Coolify/Docker target, not
+# Vercel serverless functions. Vercel would auto-create one serverless
+# function per .ts file and the Hobby plan caps at 12.
+/api/
+
 # Don't deploy dev artifacts (these don't need to be uploaded to Vercel
-# after the build, but the SOURCE files in src/, api/, and scripts/
-# ARE required at build time — Vercel will rebuild from them).
+# after the build, but the SOURCE files in src/, scripts/ ARE required
+# at build time — Vercel will rebuild from them).
 /node_modules/
 /bun.lock
 /bun.lockb
